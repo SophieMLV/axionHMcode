@@ -6,7 +6,8 @@ axionHMcode is a code to compute the non-linear matter power spectrum in a mixed
 
 The model computes the non-linear power spectrum by using the full expanded power spectrum
 
-![equation](http://www.sciweavers.org/upload/Tex2Img_1644588958/render.png)
+![codesketch](eq_halo_model.png)
+
 
 The cold part can be computed as usually with the standard halo model (see [Massara et al.](https://arxiv.org/abs/1410.6813) or [Mead et al.](https://arxiv.org/abs/2009.01858)) whereas the cross and axion part have to take into accound the non clustering of axions on small scales due to free-streaming. This is done by splitting the axion overdensity into a clustered and linear component. For details see [Massara et al.](https://arxiv.org/abs/1410.6813) where the same full treatment were be used for massive neutrinos, but can be translated for any other warm/hot, i.e. free streaming, matter component. 
 
