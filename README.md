@@ -19,10 +19,13 @@ The total computation time is around 4 minutes. The time is much longer than e.g
 
 ## Code Modifications
 
-The axionHMcode can also uses some parameters from the 'HMcode' from [Mead et al.](https://arxiv.org/abs/2009.01858) which improve the predictions. The parameters can switch on by the setting the corresponding parameters to True or False in the function for the non-linear power spectrum. The parameters are the smoothing parameter, alpha, the halo bloating term, eta_given, the one halo damping on large scales, one_halo_damping and the two halo damping on large scales, two_halo_damping. By default only the one halo damping is switched on, because on large scales the non-linear power spectrum should be equal to the linear which is given by the two halo term and thus the one halo term has to be damped on large scales (see [Mead et al.](https://arxiv.org/abs/2009.01858) for details).  
+The axionHMcode can also uses some parameters from the 'HMcode' in [Mead et al.](https://arxiv.org/abs/2009.01858) which improve the predictions. The parameters can switch on by the setting the corresponding parameters to True or False in the function for the non-linear power spectrum. The parameters are the smoothing parameter, alpha, the halo bloating term, eta_given, the one halo damping on large scales, one_halo_damping and the two halo damping on large scales, two_halo_damping. By default only the one halo damping is switched on, because on large scales the non-linear power spectrum should be equal to the linear which is given by the two halo term and thus the one halo term has to be damped on large scales (see [Mead et al.](https://arxiv.org/abs/2009.01858) for details).  
 
 ## Contact data
 
 If you find any bugs, have any questions with respect to the code, please contact me via s.vogt@stud.uni-goettingen.de
+
+## Notes
+A similiar code with ultra-light axsions instead of massive neutrinos is publicly available under https://github.com/SophieMLV/axionHMcode 
 
 
