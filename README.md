@@ -26,6 +26,6 @@ The axionHMcode can also uses some parameters from the 'HMcode' in [Mead et al.]
 If you find any bugs, have any questions with respect to the code, please contact me via s.vogt@stud.uni-goettingen.de
 
 ## Notes
-A similiar code with ultra-light axsions instead of massive neutrinos is publicly available under https://github.com/SophieMLV/axionHMcode 
+A similiar code with ultra-light massive neutrinos instead of axions is publicly available under https://github.com/SophieMLV/nuHMcode 
 
 
