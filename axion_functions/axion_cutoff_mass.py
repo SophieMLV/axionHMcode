@@ -27,7 +27,7 @@ def func_halo_jeans_kscale(M, cosmo_dic, power_spec_dic_sigma):
     form_factor = func_for_norm_factor(concentration) 
     M_in_formula = M / cosmo_dic['h'] # note that we need solar_mass units for M in the formula
     return prefactor * (m_ax/1e-22)**(2/3) * (form_factor/concentration**2 *100/((np.log(11) - 10/11)))**(-1/3) \
-           * (M_in_formula/1e10)**(1/9) * (omega_cold/0.12)**(2/9) / cosmo_dic['h'] * (1+z)**(-1/4) 
+           * (M_in_formula/1e10)**(1/9) * (omega_cold/0.12)**(2/9) / cosmo_dic['h'] * (1+z)**(1/3) 
     
     
 def func_jeans_virial_ratio(M, cosmo_dic, power_spec_dic_sigma):
