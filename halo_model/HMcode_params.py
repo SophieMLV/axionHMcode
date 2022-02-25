@@ -48,16 +48,27 @@ def func_eta(k, PS_cold):
     sigma8 = func_sigma_r(8.0, k, PS_cold)
     return 0.1281 * sigma8**(-0.3644)
 
+def func_R_nonlin_2(cosmo_dic, k, PS):
+    """
+    k is in units of h/Mpc and PS in (Mpc/h)^3
+    returns the nonlinear scale in Mpc/h defined by
+    1 = sigma(R_nonlin)
+    """
+    delta_c = func_delta_c(cosmo_dic)
+    def find_root(R):
+        return func_sigma_r(R, k, PS) - delta_c
+    R_nonlin = optimize.brentq(find_root, 1e-10, 10.)
+    return R_nonlin
 
     
-def func_alpha_param(cosmo_dic, k, PS_cold):
+def func_alpha_param(cosmo_dic, k, PS_cold, LCDM=True):
     """
     k is in units of h/Mpc and PS_cold in (Mpc/h)^3
     retruns smoothing parameter
     as in HMCode2020: https://arxiv.org/abs/2009.01858 in table 2
     """
     R = np.linspace(1e-3, 1e2, 1000)
-    R_nonlin = func_R_nonlin(cosmo_dic, k, PS_cold)
+    R_nonlin = func_R_nonlin_2(cosmo_dic, k, PS_cold)
     ln_R = np.log(R)
     ln_sigma_squared = np.log(func_sigma_r(R, k, PS_cold)**2)
     func_lnsigma_lnR = interpolate.interp1d(ln_R, ln_sigma_squared, kind = 'cubic')
@@ -65,6 +76,7 @@ def func_alpha_param(cosmo_dic, k, PS_cold):
     neff = -3 - lnsigma_lnR
     
     return 1.875 * 1.603**neff
+
 
 
 def HMCode_param_dic(cosmo_dic, k_sigma, PS_cold_sigma):
