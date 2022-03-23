@@ -36,7 +36,7 @@ def func_delta_c(cosmo_dic):
     """
     returns critical denity for spherical/ellepsoidal collapse for LCDM cosmos
     """                    
-    return 1.686 #* func_Omega_m_z(cosmo_dic)**(0.0055)
+    return 1.686
     
 def func_Delta_vir(cosmo_dic, Omega_0):
     """

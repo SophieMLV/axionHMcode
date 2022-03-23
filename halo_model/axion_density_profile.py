@@ -69,6 +69,7 @@ def func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic_sigma, M_cut, rho_c
     we get the correct mass of the soliton halo, 
     see func_central_density_param
     the density profile has units solar_mass/Mpc^3 * h^2
+    see masterthesis sec. 5.2.3.
     """
     #distinguish whether M is an array or a scalar
     if isinstance(M, (int, float)) == True:
@@ -174,7 +175,7 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic_sigma, M_cut, eta_gi
                 return func_ax_halo_mass(M, cosmo_dic, power_spec_dic_sigma, M_cut, dens, eta_given=eta_given) - cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0'] * M
             dens_param = optimize.root(func_find_root, x0 = guess).x
             #sometimes the solution is not really a solution,
-            #so set than the central density paameter to zero, ie so solution can be found
+            #so set than the central density paameter to zero, ie no solution can be found
             if np.abs(guess - dens_param) > 100.:
                 return 0.
             else:

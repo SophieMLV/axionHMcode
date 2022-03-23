@@ -63,7 +63,7 @@ def func_dens_profile_kspace(M, k, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Ome
     NOTE: be carefull, we have two k's: k is the k, where the function is evaluated 
     and k_sigma is needed for for sigma(M, z) (the same is true for the PSs)
     NOTE: Omega_0 must match with chosen PS_sigma
-    returns Fourier trafo of NFW profile (dimensionless) at k as given in my masterthesis eq. TBC
+    returns Fourier trafo of NFW profile (dimensionless) at k as given in my masterthesis eq. 4.20
     """
     #eta is a halo shape parameter introduced my Mead in https://arxiv.org/abs/2009.01858 in Tab2
     if eta_given == True:
@@ -97,7 +97,7 @@ def func_delta_char(M, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_
     """
     k_sigma units of h/Mpc, M in solar_mass/h and PS_sigma in (Mpc/h)^3 
     returns NFW profile in h^2 * M_sun/Mpc^3 at k in h/Mpc
-    as given in my masterthesis eq. TBC
+    as given in my masterthesis eq. 4.15 (left)
     """
     #eta is a halo shape parameter introduced my Mead in https://arxiv.org/abs/2009.01858 in Tab2
     if eta_given == True:

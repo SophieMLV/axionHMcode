@@ -60,7 +60,7 @@ def load_LCDM_cosmology_input(params_path):
     load the coresponding LCDM cosmology as in load_cosmology_inputs
     from the same input file in params_path
     by ignoring the axion fraction and hardcode omega_ax_0 = 1e-20.
-    This is needed because axionCAMB need omega_ax_0 > 0
+    This is because axionCAMB needs omega_ax_0 > 0
     """
     cosmo_dic = {}
     file = open(params_path)
