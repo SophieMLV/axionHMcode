@@ -23,14 +23,14 @@ def func_core_radius(M, cosmo_dic):
     """
     grav_const = const.G.to('m**3/(Msun*s**2)').value
     M_tot = (1 + cosmo_dic['omega_ax_0']/cosmo_dic['omega_db_0']) * M/cosmo_dic['h'] # in solar_mass
-    r_vir = func_r_vir((1 + cosmo_dic['omega_ax_0']/cosmo_dic['omega_db_0']) * M, cosmo_dic, cosmo_dic['Omega_db_0']) / cosmo_dic['h'] * 3.086e+22 # in m
+    r_vir = func_r_vir((1 + cosmo_dic['omega_ax_0']/cosmo_dic['omega_db_0']) * M, cosmo_dic, cosmo_dic['Omega_m_0']) / cosmo_dic['h'] * 3.086e+22 # in m
     v_vir = np.sqrt(grav_const*M_tot/r_vir) # in m/s
     
     h_bar = const.hbar.value
     m_ax = cosmo_dic['m_ax'] * 1.78266269594644e-36 # in kg
     r_core = 2 * np.pi * h_bar / (7.5 * m_ax * v_vir) # in m
     
-    return r_core / (3.086e+22) * cosmo_dic['h'] # in Mpc/h
+    return r_core / (3.086e+22) * cosmo_dic['h'] * (1+cosmo_dic['z'])**(-1./2.) # in Mpc/h
 
 
 
@@ -69,6 +69,7 @@ def func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic_sigma, M_cut, rho_c
     we get the correct mass of the soliton halo, 
     see func_central_density_param
     the density profile has units solar_mass/Mpc^3 * h^2
+    see masterthesis sec. 5.2.3.
     """
     #distinguish whether M is an array or a scalar
     if isinstance(M, (int, float)) == True:
@@ -174,7 +175,7 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic_sigma, M_cut, eta_gi
                 return func_ax_halo_mass(M, cosmo_dic, power_spec_dic_sigma, M_cut, dens, eta_given=eta_given) - cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0'] * M
             dens_param = optimize.root(func_find_root, x0 = guess).x
             #sometimes the solution is not really a solution,
-            #so set than the central density paameter to zero, ie so solution can be found
+            #so set than the central density paameter to zero, ie no solution can be found
             if np.abs(guess - dens_param) > 100.:
                 return 0.
             else:

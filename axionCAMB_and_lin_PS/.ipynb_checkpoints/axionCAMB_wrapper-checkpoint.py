@@ -122,12 +122,12 @@ def axioncamb_params(params_path, arg_dic={}, print_info = True,
             print(line)
         return arg_dic
     else:
-        vals = {'omega_b_0': ombh2, 'omega_d_0': omch2, 'omega_db_0': omch2+ombh2, 'omega_ax_0': omaxh2, 'omega_m_0': omch2+ombh2+omaxh2, 
+        arg_dic = {'omega_b_0': ombh2, 'omega_d_0': omch2, 'omega_db_0': omch2+ombh2, 'omega_ax_0': omaxh2, 'omega_m_0': omch2+ombh2+omaxh2, 
                 'm_ax': m_ax, 'h': hubble/100., 'z': transfer_redshift__1___, 
                 'Omega_b_0': ombh2/(hubble/100)**2, 'Omega_d_0': omch2/(hubble/100)**2, 'Omega_ax_0': omaxh2/(hubble/100)**2, 'Omega_db_0': (ombh2+omch2)/(hubble/100)**2, 
                 'Omega_m_0': (ombh2+omch2+omaxh2)/(hubble/100)**2, 'Omega_w_0': 1-(ombh2+omch2+omaxh2)/(hubble/100)**2, 
                 'ns': scalar_spectral_index__1___, 'As': scalar_amp__1___, 'k_piv': pivot_scalar, 'transfer_kmax': transfer_kmax}
-        return vals
+        return arg_dic
     
 
 def run_axioncamb(params_path, camb_exec_dir, arg_dic, print_info = True):

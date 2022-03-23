@@ -17,7 +17,7 @@ from halo_mass_function import *
 def func_non_lin_PS_matter(M, k, PS, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, 
                            alpha = False, eta_given = False, nu_one_halo=False, ax_one_halo=False, one_halo_damping = False, two_halo_damping = False):    
     """ 
-    The cold halo model with (if set to True) the modifications of HMcode2020 https://arxiv.org/abs/2009.01858
+    The cold halo model se master thesis eq. 4.9 with (if set to True) the modifications of HMcode2020 https://arxiv.org/abs/2009.01858
     Since we work with axions, I indroduce the possibility to tread the axions as the HMcode2020 treates the neutrinos
     by substracting them from the one halo term.
     k, k_sigma units of h/Mpc, M in solar_mass/h and PS, PS_sigma in (Mpc/h)^3 

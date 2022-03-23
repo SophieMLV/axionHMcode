@@ -89,9 +89,7 @@ def func_power_spec_interp_dic(power_spec_dic, cosmo_dic):
     power_spec_interp_dic['k'], _ = func_PS_interpolate_M(cosmo_dic['M_min'], power_spec_dic['k'], power_spec_dic['cold'], cosmo_dic, cosmo_dic['Omega_db_0'])
     power_spec_interp_dic['power_total'] = func_PS_interpolate(power_spec_interp_dic['k'], power_spec_dic['k'], power_spec_dic['power_total'])
     power_spec_interp_dic['power_CDM'] = func_PS_interpolate(power_spec_interp_dic['k'], power_spec_dic['k'], power_spec_dic['power_CDM'])
-    power_spec_interp_dic['power_baryon'] = func_PS_interpolate(power_spec_interp_dic['k'], power_spec_dic['k'], power_spec_dic['power_baryon']) 
-    
-    power_spec_interp_dic['cold'] = func_PS_interpolate(power_spec_interp_dic['k'], power_spec_dic['k'], power_spec_dic['cold'])
-    
+    power_spec_interp_dic['power_baryon'] = func_PS_interpolate(power_spec_interp_dic['k'], power_spec_dic['k'], power_spec_dic['power_baryon'])  
+    power_spec_interp_dic['cold'] = func_PS_interpolate(power_spec_interp_dic['k'], power_spec_dic['k'], power_spec_dic['cold'])    
     power_spec_interp_dic['power_axion'] = func_PS_interpolate(power_spec_interp_dic['k'], power_spec_dic['k'], power_spec_dic['power_axion'])
     return power_spec_interp_dic

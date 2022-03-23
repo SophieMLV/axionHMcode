@@ -16,7 +16,7 @@ from PS_nonlin_cold import *
 def func_full_halo_model_ax(M, power_spec_dic, power_spec_dic_sigma, cosmo_dic, hmcode_dic, axion_dic, 
                             alpha = False, eta_given = False, one_halo_damping = True, two_halo_damping = False):
     """ 
-    My Full Halo Model with Axions, see my masterhesis eq TBC to see the full formula
+    My Full Halo Model with Axions, see my masterhesis eq 5.2-5.10 to see the full formula
     all modifications form HMcode2020 https://arxiv.org/abs/2009.01858 can be used (if wanted)
     by default use only the damping in the one halo term on large scales (for all parts) 
     to ensure the correct behaviour on large scales
