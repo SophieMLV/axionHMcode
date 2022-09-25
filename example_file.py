@@ -44,7 +44,7 @@ finally:
     f.close()
     
 #IMPORTANT:Change here the path to the axionCAMB executable path directory (second path in the function)
-# assumes that thee axionCAMB executable is names .camb
+# assumes that the axionCAMB executable is named .camb
 axionCAMB_exe_path = '/Users/sophievogt/Documents/Studium/Master/4._5.Semester/Masterarbeit/axionCAMB'
 if os.path.exists(axionCAMB_exe_path+'/./camb') == False:
     print("executabel axionCAMB is not in the given directory, pleas check the path")
@@ -137,7 +137,7 @@ np.savetxt(datafile_path , data_ax)
 
 
 print('#' * 50)
-print("axionHM is finished, total computation time: {:.0f} s".format(time.time() -start))
+print("axionHMcode is finished, total computation time: {:.0f} s".format(time.time() -start))
 print('#' * 50)
 
 
