@@ -14,8 +14,10 @@ The cold part can be computed as usually with the standard halo model (see [Mass
 ## How Does the Code Work?
 
 The code expected an input file as given in "input_file.txt" and an executable 'axionCAMB' program named ./camb . The code works for an axion mass range of [10^-28 eV, 10^21 eV] and at the moment for a fraction of 10% axions of the total dark matter. 
-A example python file is given in "example_file.py". To run the file you have to change the ‘input_file_path’ and the ‘axionCAMB_exe_path’ (complete path). If the paths are not correct the python code will produce an error massage. Beside the non-linear total matter power spectrum the example path also computes the non-linear power spectrum in a LCDM cosnology where the axion density is transformed into CDM desnity. Both power spectra are saved in a file named as given by the varaible "datafile_path". The units of the wavenumber and the power spectra are h/Mpc and (Mpc/h)^3 respectively. The code also plot the ratio between the MDM and LCDM linear and non-linear power spectrum.
-The total computation time is around 4 minutes. The time is much longer than e.g. the HMcode since the code has to compute some axion halo parameters for which no fitting functions are given and thus have to compute for each halo individually (see master thesis (will follow) or ask me, if you have a question about it). 
+
+An example python file is given in "example_file.py". To run the file you have to change the ‘input_file_path’ and the ‘axionCAMB_exe_path’ (complete path). If the paths are not correct the python code will produce an error massage. Beside the non-linear total matter power spectrum the example path also computes the non-linear power spectrum in a LCDM cosnology where the axion density is transformed into CDM desnity. Both power spectra are saved in a file named as given by the varaible "datafile_path". The units of the wavenumber and the power spectra are h/Mpc and (Mpc/h)^3 respectively. The code also plot the ratio between the MDM and LCDM linear and non-linear power spectrum.
+
+The total computation time is around 4 minutes. The time is much longer than e.g. the HMcode since the code has to compute some axion halo parameters for which no fitting functions are given and thus have to compute for each halo individually (see my paper https://arxiv.org/abs/2209.13445 or ask me, if you have a question about it). 
 
 ## Code Modifications
 
