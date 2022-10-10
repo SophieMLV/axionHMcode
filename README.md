@@ -1,6 +1,6 @@
 # The Non-linear Power Spectrum with axionHMcode
 
-axionHMcode is a code to compute the non-linear matter power spectrum in a mixed dark matter cosmology with ultra-light axion (ULA) component of the dark matter. A very accurate halo model for a LCDM or massive neutrino cosmology is given by [Mead et al.](https://arxiv.org/abs/2009.01858) by the 'HMcode'. Since this model uses some of the fitting parameters and is inspired by this ode the presented code in named after 'HMcode'.
+axionHMcode is a code to compute the non-linear matter power spectrum in a mixed dark matter cosmology with ultra-light axion (ULA) component of the dark matter as described in https://arxiv.org/abs/2209.13445. A very accurate halo model for a LCDM or massive neutrino cosmology is given by [Mead et al.](https://arxiv.org/abs/2009.01858) by the 'HMcode'. Since this model uses some of the fitting parameters and is inspired by this ode the presented code in named after 'HMcode'.
 
 ## Theory
 
@@ -26,6 +26,6 @@ The axionHMcode can also uses some parameters from the 'HMcode' in [Mead et al.]
 If you find any bugs, have any questions with respect to the code, please contact me via s.vogt@stud.uni-goettingen.de
 
 ## Notes
-A similiar code with ultra-light massive neutrinos instead of axions is publicly available under https://github.com/SophieMLV/nuHMcode 
+A similiar code with massive neutrinos instead of axions is publicly available under https://github.com/SophieMLV/nuHMcode 
 
 
