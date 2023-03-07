@@ -35,7 +35,7 @@ def func_axion_param_dic(M, cosmo_dic, power_spec_dic_sigma, eta_given=False):
     PS_cold = power_spec_dic_sigma['cold']
     integrand_arr = func_halo_mass_function(axion_param_dic['M_int'], k, PS_cold , cosmo_dic, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_db_0']) * \
                     axion_param_dic['M_ax'] * \
-                    func_halo_bias(axion_param_dic['M_int'], k, PS_cold, cosmo_dic, cosmo_dic['Omega_db_0'])
+                    func_halo_bias(axion_param_dic['M_int'], k, PS_cold, cosmo_dic['Omega_db_0'])
     axion_param_dic['frac_cluster'] = integrate.simps(y= integrand_arr, x = axion_param_dic['M_int'])/ func_rho_comp_0(cosmo_dic['Omega_ax_0'])
     
     return axion_param_dic

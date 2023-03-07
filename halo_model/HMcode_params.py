@@ -54,11 +54,15 @@ def func_R_nonlin_2(cosmo_dic, k, PS):
     returns the nonlinear scale in Mpc/h defined by
     1 = sigma(R_nonlin)
     """
-    delta_c = func_delta_c(cosmo_dic)
+    delta_c = func_delta_c()
     def find_root(R):
         return func_sigma_r(R, k, PS) - delta_c
-    R_nonlin = optimize.brentq(find_root, 1e-10, 10.)
-    return R_nonlin
+    
+    if find_root(1e-10) * find_root(10.) >= 0.:
+        return -1 # if equation as no soln, return -1
+    else:
+        R_nonlin = optimize.brentq(find_root, 1e-10, 10.)
+        return R_nonlin
 
     
 def func_alpha_param(cosmo_dic, k, PS_cold, LCDM=True):
@@ -69,11 +73,14 @@ def func_alpha_param(cosmo_dic, k, PS_cold, LCDM=True):
     """
     R = np.linspace(1e-3, 1e2, 1000)
     R_nonlin = func_R_nonlin_2(cosmo_dic, k, PS_cold)
-    ln_R = np.log(R)
-    ln_sigma_squared = np.log(func_sigma_r(R, k, PS_cold)**2)
-    func_lnsigma_lnR = interpolate.interp1d(ln_R, ln_sigma_squared, kind = 'cubic')
-    lnsigma_lnR = misc.derivative(func_lnsigma_lnR, np.log(R_nonlin))
-    neff = -3 - lnsigma_lnR
+    if R_nonlin <= R[0]:
+        neff = -3
+    else:
+        ln_R = np.log(R)
+        ln_sigma_squared = np.log(func_sigma_r(R, k, PS_cold)**2)
+        func_lnsigma_lnR = interpolate.interp1d(ln_R, ln_sigma_squared, kind = 'cubic', bounds_error=False, fill_value=0.)
+        lnsigma_lnR = misc.derivative(func_lnsigma_lnR, np.log(R_nonlin))
+        neff = -3 - lnsigma_lnR
     
     return 1.875 * 1.603**neff
 

@@ -20,10 +20,12 @@ def func_z_formation(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, f = 0.01):
     in HMCode2020: https://arxiv.org/abs/2009.01858 in eq. 21
     """
     z = cosmo_dic['z']
-    D_norm =  func_D_z_norm(z, cosmo_dic)
+    Omega_m_0 = cosmo_dic['Omega_m_0']
+    Omega_w_0 = cosmo_dic['Omega_w_0']
+    D_norm =  func_D_z_norm(z, Omega_m_0, Omega_w_0)
     def func_find_root(x, Mass):
-        nu = func_nu(f*Mass, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma)
-        return func_D_z_norm(x, cosmo_dic) - D_norm * nu
+        nu = func_nu(f*Mass, k_sigma, PS_sigma, Omega_0_sigma)
+        return func_D_z_norm(x, Omega_m_0, Omega_w_0) - D_norm * nu
     if isinstance(M, (int, float)) == True:
         #test if we find a root, if not by definition formation redshift is set to given z.
         if func_find_root(z, M)*func_find_root(100., M) > 0.:
@@ -68,12 +70,12 @@ def func_dens_profile_kspace(M, k, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Ome
     #eta is a halo shape parameter introduced my Mead in https://arxiv.org/abs/2009.01858 in Tab2
     if eta_given == True:
         eta = hmcode_dic['eta']
-        nu = func_nu(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma)
+        nu = func_nu(M, k_sigma, PS_sigma, Omega_0_sigma)
     else:
         eta = np.array([0.]) 
         nu = 1.
     
-    R_vir = func_r_vir(M, cosmo_dic, Omega_0)
+    R_vir = func_r_vir(cosmo_dic['z'], M, Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'])
     concentration = func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) / (nu**eta)
     k_R_vir = np.outer(R_vir, k)
     a = np.outer(R_vir/concentration, k)
@@ -106,7 +108,7 @@ def func_delta_char(M, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_
     else:
         eta = np.array([0.]) 
         nu = 1.   
-    Delta_vir = func_Delta_vir(cosmo_dic, Omega_0)
+    Delta_vir = func_Delta_vir(cosmo_dic['z'], Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'])
     
     concentration = func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) / (nu**eta)
     delta_char = func_rho_comp_0(Omega_0) * Delta_vir * concentration **3 / (3. * func_for_norm_factor(concentration))
@@ -122,14 +124,14 @@ def NFW_profile(M, r, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0
     #eta is a halo shape parameter introduced my Mead in https://arxiv.org/abs/2009.01858 in Tab2
     if eta_given == True:
         eta = hmcode_dic['eta']
-        nu = func_nu(M, k_sigma, PS_sigma, cosmo_dic, Omega_0)
+        nu = func_nu(M, k_sigma, PS_sigma, Omega_0)
     else:
         eta = np.array([0.]) 
         nu = 1.
         
     concentration = func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) / (nu**eta)
     normalisation = func_delta_char(M, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = eta_given) 
-    r_s = func_r_vir(M, cosmo_dic, Omega_0) / concentration
+    r_s = func_r_vir(cosmo_dic['z'], M, Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0']) / concentration
     
     NFW_func = 1 /((r/r_s) * (1+r/r_s)**2)
     

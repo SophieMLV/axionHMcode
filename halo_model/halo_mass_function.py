@@ -37,8 +37,8 @@ def func_dlnsigma2_dlnM(M, k_sigma, PS_sigma, cosmo_dic, Omega_0, Omega_0_sigma)
     k_sigma units of h/Mpc, M in solar_mass/h and PS_sigma in (Mpc/h)^3 
     returns integral for the halo mass function as in my masterthesis eq. 4.23
     """
-    R = func_R_M(M, cosmo_dic, Omega_0) #translate M into R 
-    sigma = func_sigma_M(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma)
+    R = func_R_M(M, Omega_0) #translate M into R 
+    sigma = func_sigma_M(M, k_sigma, PS_sigma, Omega_0_sigma)
 
     integrand = func_term_derivative_sigma2_M(R, k_sigma) * PS_sigma / k_sigma**2
     
@@ -51,6 +51,6 @@ def func_halo_mass_function(M, k_sigma, PS_sigma, cosmo_dic, Omega_0, Omega_0_si
     returns halo mass functions in untits h^4/(M_sun Mpc^3)
     with teh definition as in my  masterthesis eq. 4.21
     """
-    nu = func_nu(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) 
+    nu = func_nu(M, k_sigma, PS_sigma, Omega_0_sigma) 
     return 1./2. * func_rho_comp_0(Omega_0) / M**2 * func_sheth_tormen(nu) \
            * np.abs(func_dlnsigma2_dlnM(M, k_sigma, PS_sigma, cosmo_dic, Omega_0, Omega_0_sigma))

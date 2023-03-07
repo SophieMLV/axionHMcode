@@ -36,7 +36,7 @@ def func_jeans_virial_ratio(M, cosmo_dic, power_spec_dic_sigma):
     returns the ratio between the halo jeans scale and the virial radius
     """
     halo_jeans_scale = np.pi / func_halo_jeans_kscale(M, cosmo_dic, power_spec_dic_sigma) # in Mpc/h
-    virial_radius = func_r_vir(M, cosmo_dic, cosmo_dic['Omega_db_0']) # in Mpc/h
+    virial_radius = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0']) # in Mpc/h
     
     return halo_jeans_scale/virial_radius
 

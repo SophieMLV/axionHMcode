@@ -45,7 +45,7 @@ def func_non_lin_PS_matter(M, k, PS, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, O
     #two halo damping and some extra factors in the two halo term to take care of nummerical issues.
     # see appendix A in https://arxiv.org/abs/2005.00009
     if two_halo_damping == True:
-        halo_bias_arr = func_halo_bias(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma)
+        halo_bias_arr = func_halo_bias(M, k_sigma, PS_sigma, Omega_0_sigma)
         integrand_arr_two = M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None] * dens_profile_arr
         
         #summand to take care of nummericals issues of the integral, see appendix A in https://arxiv.org/abs/2005.00009
@@ -55,7 +55,7 @@ def func_non_lin_PS_matter(M, k, PS, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, O
         
         two_halo = PS * factor2**2 * (1-hmcode_dic['f'] * (k/hmcode_dic['k_d'])**hmcode_dic['n_d']/(1+(k/hmcode_dic['k_d'])**hmcode_dic['n_d']))
     else:
-        halo_bias_arr = func_halo_bias(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma)
+        halo_bias_arr = func_halo_bias(M, k_sigma, PS_sigma, Omega_0_sigma)
         integrand_arr_two = M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None] * dens_profile_arr
         #summand2 take care of nummericals issues of the integral, see appendix A in https://arxiv.org/abs/2005.00009
         summand2 = func_dens_profile_kspace(np.min(M), k, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = eta_given) \
