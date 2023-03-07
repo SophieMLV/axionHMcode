@@ -8,6 +8,7 @@ import re
 import subprocess
 import sys
 import fileinput
+import numpy as np
 
 #create param infile for axionCAMB
 def axioncamb_params(params_path, arg_dic={}, print_info = True,
@@ -57,7 +58,7 @@ def axioncamb_params(params_path, arg_dic={}, print_info = True,
                 accurate_polarization='T', accurate_reionization='T',
                 do_tensor_neutrinos='T', do_late_rad_truncation='T',
                 number_of_threads=0, high_accuracy_default='F',
-                accuracy_boost=1, l_accuracy_boost=1, l_sample_boost=1):
+                 accuracy_boost=1, l_accuracy_boost=1, l_sample_boost=1):
     """
     Define a dictionary of all parameters in axionCAMB, set to their default values.
     Change some of them (if given) by the values in a given dictionary arg_dic
@@ -145,10 +146,61 @@ def run_axioncamb(params_path, camb_exec_dir, arg_dic, print_info = True):
     output = subprocess.check_output([camb_exec_dir + "/" + "./camb", file_path]).decode(sys.stdout.encoding) #run axionCAMB
 
     #go through the output to save sigma8 of the PS in the parameter dictionary arg_dic
-    for line in output.split("\n"):
-        if "sigma8" in line:
+    if bool(np.array(arg_dic['z']).shape): # check if array (skipped if float)
+        arg_dic['sigma_8'] = []
+        
+        for line in output.split("\n"):
+            if "sigma8" in line:
                 s8line = line[line.find('sigma8'):]  # Only get sigma8 part of string
-                sigma8 = float(re.findall(r'\b\d+.\d+\b', s8line)[0])
+                sigma8 = float(re.findall(r'\b\d+.+\b', s8line)[0])
+                arg_dic['sigma_8'].append(sigma8) # save sigma8 in arg_dic
+                
+    else:
+        for line in output.split("\n"):
+            if "sigma8" in line:
+                s8line = line[line.find('sigma8'):]  # Only get sigma8 part of string
+                sigma8 = float(re.findall(r'\b\d+.+\b', s8line)[0])
                 arg_dic['sigma_8'] = sigma8 # save sigma8 in arg_dic
 
     
+def redshift_array(params_path, arg_dic, print_info=False):
+    """
+    Changes input file to calculate multiple redshifts with one axionCAMB call
+    
+    Usage:
+    (1) Run axioncamb params function (assuming single redshift)
+    (2) Overwrite arg_dic['z'] with z array
+    (3) Run this function
+    (4) Run run_axioncamb with updated arg_dic and input file
+    """
+    
+    redshift_array = np.sort(arg_dic['z'])[::-1] # start with earlier redshift first
+    with open(params_path, 'r') as input_file:
+        lines = input_file.readlines()
+    
+    with open(params_path, 'w') as input_file:
+        # remove all instances of redshift-specific out files 
+        for line in lines:
+            if "transfer_redshift" in line or "transfer_file" in line or "transfer_matter" in line:
+                pass
+            elif "transfer_num_redshifts" in line:
+                sline=line.strip().split("=")
+                sline[1]=str( len(arg_dic['z']))
+                line='='.join(sline)
+                input_file.write(line + '\n' )
+            else:
+                input_file.write(line)
+            
+        # refill fields with redshift array data
+        for i in range(1, len(redshift_array)+1):
+            input_file.write('\n' + 'transfer_redshift('+ str(i) + ')=' + str(redshift_array[i-1]))
+            input_file.write('\n' + 'transfer_filename__' + str(i) + '__=transfer_out_' + str(i)  + '.dat')
+            input_file.write('\n' + 'transfer_matterpower__' + str(i) + '__=matterpower_' + str(i) +'.dat')
+
+    if print_info:
+        with open(params_path, 'r') as input_file:
+            lines = input_file.readlines()
+            for line in lines:
+                print(line)
+
+    return
