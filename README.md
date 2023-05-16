@@ -25,7 +25,7 @@ The axionHMcode can also uses some parameters from the 'HMcode' in [Mead et al.]
 
 
 ## Added Features
-The updated version of axionHMCode is based Numba for increased speed. It also includes optional parameters alpha_1, alpha_2, gamma_1, gamma_2 defined in arXiv:2111.01199 Eq. (36). To use them, just include them in your dictionary of cosmological parameters (the "cosmo_dic" file) before running the "params" and "power spectra" calculation. They are not yet inculded in the input file.
+The updated version of axionHMCode is based Numba for increased speed. It also includes optional parameters alpha_1, alpha_2, gamma_1, gamma_2 defined in arXiv:2111.01199 Eq. (36). To use them, just include them in your dictionary of cosmological parameters (the "cosmo_dic" file) before running the "params" and "power spectra" calculation using e.g. cosmo_dic['alpha_1'] = X. They are not yet inculded in the input file.
 
 ## Contact data
 
