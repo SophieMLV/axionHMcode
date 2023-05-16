@@ -126,14 +126,14 @@ def func_ax_halo_mass(M, cosmo_dic, power_spec_dic_sigma, M_cut, rho_central_par
     #distinguish whether M is an array or a scalar
     if isinstance(M, (int, float)) == True:
         r_vir = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'],  cosmo_dic['Omega_w_0'])
-        r_arr = np.geomspace(1e-15, r_vir, num=100)
+        r_arr = np.geomspace(1e-15, r_vir, num=10000)
         integrand = func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic_sigma, M_cut, rho_central_param, hmcode_params, eta_given=eta_given) * r_arr**2
         return 4 * np.pi * integrate.simps(y=integrand, x = r_arr)
     else:
         integral = np.zeros(len(M))
         for i in range(len(M)):
             upper_bound = func_r_vir(cosmo_dic['z'], M[i], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'],  cosmo_dic['Omega_w_0'])
-            R_int = np.geomspace(1e-15, upper_bound, num=100)
+            R_int = np.geomspace(1e-15, upper_bound, num=10000)
             integral[i] = 4 * np.pi * integrate.simps(y=func_dens_profile_ax(R_int, M[i], cosmo_dic, power_spec_dic_sigma, M_cut, rho_central_param[i], hmcode_params, eta_given=eta_given)*R_int**2, x=R_int)
             
         return integral
@@ -167,10 +167,10 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic_sigma, M_cut, eta_gi
             def integrand_ax(x):
                 return func_dens_profile_ax(x, M, cosmo_dic, power_spec_dic_sigma, M_cut, 1., eta_given=eta_given)*x**2
             #integral_soliton = integrate.quad(integrand_ax, 0, r_c)[0] # ALEX MODIF
-            xsamples = np.linspace(1e-6, r_c, 1000)
+            xsamples = np.linspace(1e-6, r_c, 10000)
             integral_soliton = integrate.trapezoid(integrand_ax(xsamples), x=xsamples)
             
-            r_arr = np.geomspace(1e-10 , 2*r_c, 1000)
+            r_arr = np.geomspace(1e-10 , 2*r_c, 10000)
             integrand_cold = NFW_profile(M, r_arr, power_spec_dic_sigma['k'], power_spec_dic_sigma['cold'], cosmo_dic, hmcode_params, cosmo_dic['Omega_db_0'], 
                                          cosmo_dic['Omega_db_0'], eta_given = eta_given) \
                              *r_arr**2 * cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0']
@@ -193,7 +193,7 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic_sigma, M_cut, eta_gi
             dens_param = optimize.root(func_find_root, x0 = guess).x
             #sometimes the solution is not really a solution,
             #so set than the central density paameter to zero, ie no solution can be found
-            if np.abs(guess - dens_param) > 100.:
+            if np.abs(guess - dens_param) > 10.:
                 return 0.
             else:
                 return float(dens_param)
@@ -212,10 +212,10 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic_sigma, M_cut, eta_gi
                 def integrand_ax(x):
                     return func_dens_profile_ax(x, m, cosmo_dic, power_spec_dic_sigma, M_cut, 1., hmcode_params, eta_given=eta_given)*x**2
                 #integral_soliton = integrate.quad(integrand_ax, 0, r_c[idx])[0] # ALEX MODIF
-                xsamples = np.linspace(1e-6, r_c[idx], 1000)
+                xsamples = np.linspace(1e-6, r_c[idx], 10000)
                 integral_soliton = integrate.trapezoid(integrand_ax(xsamples), x=xsamples)
 
-                r_arr = np.geomspace(1e-15 , r_c[idx], 1000)
+                r_arr = np.geomspace(1e-15 , r_c[idx], 10000)
                 integrand_cold = NFW_profile(m, r_arr, power_spec_dic_sigma['k'], power_spec_dic_sigma['cold'], cosmo_dic, hmcode_params, cosmo_dic['Omega_db_0'], 
                                              cosmo_dic['Omega_db_0'], eta_given = eta_given)*r_arr**2 * cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0'] 
                 integral_NFW = integrate.simps(y=integrand_cold, x = r_arr)
@@ -246,7 +246,7 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic_sigma, M_cut, eta_gi
                 
                 #sometimes the solution is not really a solution,
                 #so set than the central density paameter to zero, ie so solution can be found
-                if np.abs(guess - dens_param) > 100:
+                if np.abs(guess - dens_param) > 10:
                     dens_param_arr.append(0.)
                 else:
                     dens_param_arr.append(float(dens_param))
@@ -272,7 +272,7 @@ def func_dens_profile_ax_kspace(k, M, cosmo_dic, power_spec_dic_sigma, M_cut, ce
     
     #distinguish whether M is an array or a scalar
     if isinstance(M, (int, float)) == True:
-        r_arr = np.geomspace(1e-15, r_vir, num=1000)
+        r_arr = np.geomspace(1e-15, r_vir, num=10000)
         dens_profile_arr = func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic_sigma, M_cut, central_dens_param, hmcode_params, eta_given=eta_given) \
                            * r_arr**2 * np.sin(np.outer(k, r_arr)) / np.outer(k, r_arr)
         return list(4 * np.pi * integrate.simps(y=dens_profile_arr, x = r_arr, axis=-1) / M_ax)
@@ -283,9 +283,10 @@ def func_dens_profile_ax_kspace(k, M, cosmo_dic, power_spec_dic_sigma, M_cut, ce
             if  M_ax[idx] == 0:
                 dens_profile_kspace_arr.append(list(np.zeros(len(k))))
             else:
-                r_arr = np.geomspace(1e-15, r_vir[idx], num=1000)
+                r_arr = np.geomspace(1e-15, r_vir[idx], num=10000)
                 dens_profile_arr = func_dens_profile_ax(r_arr, m, cosmo_dic, power_spec_dic_sigma, M_cut, central_dens_param[idx], hmcode_params, eta_given=eta_given) \
                                    * r_arr**2 * np.sin(np.outer(k, r_arr)) / np.outer(k, r_arr)
                 dens_kspace = list(4 * np.pi * integrate.simps(y=dens_profile_arr, x = r_arr, axis=-1) / M_ax[idx] )
                 dens_profile_kspace_arr.append(dens_kspace)
+        
         return dens_profile_kspace_arr

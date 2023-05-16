@@ -47,7 +47,16 @@ def func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma):
     https://arxiv.org/abs/2009.01858 in eq. 20
     """
     B = 4.#5.196
-    return  B * (1 + func_z_formation(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) )/(1+cosmo_dic['z'])
+    if 'gamma_1' in cosmo_dic and 'gamma_2' in cosmo_dic:
+        # Implementing 2111.01199 Eq. (33) for mixed dark matter 
+        gamma_1 = cosmo_dic['gamma_1']
+        gamma_2 = cosmo_dic['gamma_2']
+        f_ax = cosmo_dic['omega_ax_0'] / (cosmo_dic['omega_ax_0']+cosmo_dic['omega_d_0'])
+        M0 = 1.6e10 * (cosmo_dic['m_ax']/1e-22)**(-4/3) * cosmo_dic['h'] # to convert to Msun/h
+        factor = 1 - f_ax + f_ax * (1+gamma_1*M0/M)**(-gamma_2)
+        B *= factor
+        
+    return  B * (1 + func_z_formation(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) )/(1+cosmo_dic['z']) 
 
 
 #function for the normaliation factor in NFW profile

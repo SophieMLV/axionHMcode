@@ -20,5 +20,6 @@ def func_halo_bias(M, k_sigma, PS_sigma, Omega_0, p = 0.3, q = 0.707):
     delta_c = func_delta_c()
     nu = func_nu(M, k_sigma, PS_sigma, Omega_0)
     halo_bias = 1. + 1./delta_c * (q*nu**2 -1 +(2*p)/(1+(q*nu**2)**p ) )
+    
     return halo_bias
 

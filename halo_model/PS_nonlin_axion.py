@@ -54,6 +54,7 @@ def func_full_halo_model_ax(M, power_spec_dic, power_spec_dic_sigma, cosmo_dic, 
     ### cross one halo term ###
     integrand_arr_one_halo_cross = axion_dic['M_int'][:, None] * axion_dic['M_ax'][:, None] * halo_mass_func_arr_2[:, None]\
                                    * dens_profile_cold_arr_2 * dens_profile_ax_arr_2 # integral over reduced array [M_cut, inf]
+        
     if one_halo_damping == True:
         one_halo_term_cross = (k/hmcode_dic['k_star'])**4 / (1+(k/hmcode_dic['k_star'])**4) \
                           * integrate.simps(integrand_arr_one_halo_cross, x = axion_dic['M_int'], axis = 0) \
@@ -66,7 +67,7 @@ def func_full_halo_model_ax(M, power_spec_dic, power_spec_dic_sigma, cosmo_dic, 
     ### cross two halo term ###
     integrand_arr_two_halo_cross = M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None] * dens_profile_cold_arr  # integral over M ~[0, inf]
     integrand_arr_two_halo_2_cross = axion_dic['M_ax'][:, None] * halo_mass_func_arr_2[:, None] * halo_bias_arr_2[:, None] * dens_profile_ax_arr_2 # integral over reduced array [M_cut, inf]
-    
+       
     #summand2_cross to take care of nummericals issues of the integral, see appendix A in https://arxiv.org/abs/2005.00009
     summand2_cross = func_dens_profile_kspace(np.min(M), k, k_sigma, PS_cold_sigma, cosmo_dic, hmcode_dic, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_db_0'], eta_given = eta_given) \
                      * ( 1 - integrate.simps(M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None], x = M, axis = 0) \
@@ -85,6 +86,7 @@ def func_full_halo_model_ax(M, power_spec_dic, power_spec_dic_sigma, cosmo_dic, 
     integrand_arr_one_halo_ax =  axion_dic['M_ax'][:, None]**2 * halo_mass_func_arr_2[:, None] * np.array(dens_profile_ax_arr_2)**2 #for the integral over reduced array [M_cut, inf] 
     integrand_arr_two_halo_ax = axion_dic['M_ax'][:, None] * halo_mass_func_arr_2[:, None] * halo_bias_arr_2[:, None] * dens_profile_ax_arr_2 #for the integral over reduced array [M_cut, inf]
     
+        
     if one_halo_damping == True:
         one_halo_term_ax = (k/hmcode_dic['k_star'])**4 / (1+(k/hmcode_dic['k_star'])**4) \
                            * integrate.simps(integrand_arr_one_halo_ax, x = axion_dic['M_int'], axis = 0) \

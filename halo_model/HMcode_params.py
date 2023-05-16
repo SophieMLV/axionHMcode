@@ -71,6 +71,7 @@ def func_alpha_param(cosmo_dic, k, PS_cold, LCDM=True):
     retruns smoothing parameter
     as in HMCode2020: https://arxiv.org/abs/2009.01858 in table 2
     """
+
     R = np.linspace(1e-3, 1e2, 1000)
     R_nonlin = func_R_nonlin_2(cosmo_dic, k, PS_cold)
     if R_nonlin <= R[0]:
