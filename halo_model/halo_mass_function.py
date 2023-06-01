@@ -59,7 +59,7 @@ def func_halo_mass_function(M, k_sigma, PS_sigma, cosmo_dic, Omega_0, Omega_0_si
         alpha_2 = cosmo_dic['alpha_2']
         f_ax = cosmo_dic['omega_ax_0'] / (cosmo_dic['omega_ax_0']+cosmo_dic['omega_d_0'])
         M0 = 1.6e10 * (cosmo_dic['m_ax']/1e-22)**(-4/3) * cosmo_dic['h'] # to convert to Msun/h
-        factor = 1 - f_ax + f_ax*(1+(M0/M)**(-alpha_1))**(-alpha_2/alpha_1)
+        factor = 1 - f_ax + f_ax*(1+(M/M0)**(-alpha_1))**(-alpha_2/alpha_1)
     else:
         factor = 1
     
