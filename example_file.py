@@ -66,23 +66,25 @@ print("omega_m = {0} \nomega_cdm = {1} \nomega_ax = {2} \nomega_b = {3} \nm_ax =
 print('-' * 50)
 print("axionCAMB is running. Computes transfer function for cosmology with an axion fraction of {}"
       .format(cosmos['Omega_ax_0']/(cosmos['Omega_ax_0']+cosmos['Omega_d_0'])))
-axionCAMB_wrapper.axioncamb_params('paramfiles/paramfile_axionCAMB.txt', 
+paramfile_axionCAMB = 'paramfile_axionCAMB.txt'
+axionCAMB_wrapper.axioncamb_params(paramfile_axionCAMB, 
                                    cosmos, output_root='paramfiles/cosmos', print_info = False)
-axionCAMB_wrapper.run_axioncamb('paramfiles/paramfile_axionCAMB.txt', 
+axionCAMB_wrapper.run_axioncamb(paramfile_axionCAMB, 
                                 axionCAMB_exe_path, 
                                 cosmos, print_info = False)
 
 print("axionCAMB is running. Computes transfer function for a LCDM cosmology")
-axionCAMB_wrapper.axioncamb_params('paramfiles/paramfile_axionCAMB_LCDM.txt', 
+paramfile_axionCAMB_LCDM = 'paramfile_axionCAMB_LCDM.txt'
+axionCAMB_wrapper.axioncamb_params(paramfile_axionCAMB_LCDM, 
                                    cosmos_LCDM, output_root='paramfiles/cosmos_LCDM', print_info = False)
-axionCAMB_wrapper.run_axioncamb('paramfiles/paramfile_axionCAMB_LCDM.txt', 
+axionCAMB_wrapper.run_axioncamb(paramfile_axionCAMB_LCDM, 
                                 axionCAMB_exe_path, 
                                 cosmos_LCDM, print_info = False)
 print("computation time: {:.0f} s".format(time.time() -start))
 
 
 ################################################################################
-# Create linear power spectra from axionCAMB tranfer functions 
+# Create linear power spectra from axionCAMB transfer functions 
 ################################################################################
 #lin PS on given k range
 power_spec_dic_ax = lin_power_spectrum.func_power_spec_dic('paramfiles/cosmos_transfer_out.dat', cosmos)
