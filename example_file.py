@@ -45,7 +45,7 @@ finally:
     
 #IMPORTANT:Change here the path to the axionCAMB executable path directory (second path in the function)
 # assumes that the axionCAMB executable is named .camb
-axionCAMB_exe_path = 'axionCMB_path
+axionCAMB_exe_path = 'axionCMB_path'
 if os.path.exists(axionCAMB_exe_path+'/./camb') == False:
     print("executable axionCAMB is not in the given directory, please check the path")
       
@@ -93,7 +93,7 @@ power_spec_interp_dic_LCDM = lin_power_spectrum.func_power_spec_interp_dic(power
 
 
 ################################################################################
-# Compute parameter related to axions and HMCode2020
+# Compute parameters related to axions and HMCode2020
 ################################################################################
 print('-' * 50)
 M_arr = np.logspace(cosmos['M_min'], cosmos['M_max'], 100)
@@ -125,7 +125,7 @@ PS_LCDM_matter_nonlin = PS_nonlin_cold.func_non_lin_PS_matter(M_arr, power_spec_
 
 
 ################################################################################
-# Save both power stepctra in files
+# Save both power spectra in files
 ################################################################################
 print('-' * 50)
 print("Save the non-linear power spectra in a file in the folowing order:")
@@ -142,7 +142,7 @@ print('#' * 50)
 
 
 ################################################################################
-# Make ratio plot of the two power spectra
+# Make a ratio plot of the two power spectra
 ################################################################################
 plt.semilogx(power_spec_dic_ax['k'], PS_matter_nonlin[0]/PS_LCDM_matter_nonlin[0], label='non-linear ratio', color='r')
 plt.semilogx(power_spec_dic_ax['k'], power_spec_dic_ax['power_total']/power_spec_dic_LCDM['power_total'], label='non-linear ratio', linestyle='--', color='r')
