@@ -34,24 +34,24 @@ print('#' * 50)
 print('Set-up experiment parameters')
 #print('#' * 50)
 
-#IMPORTANT: give the correct path to the intput file which contains all important cosmological parameter
+#IMPORTANT: give the correct path to the input file which contains all important cosmological parameters
 input_file_path = 'input_file.txt'
 try:
     f = open(input_file_path)
 except IOError:
-    print("Input file not accessible, pleas check the file path")
+    print("Input file not accessible, please check the file path")
 finally:
     f.close()
     
 #IMPORTANT:Change here the path to the axionCAMB executable path directory (second path in the function)
 # assumes that the axionCAMB executable is named .camb
-axionCAMB_exe_path = '/Users/sophievogt/Documents/Studium/Master/4._5.Semester/Masterarbeit/axionCAMB'
+axionCAMB_exe_path = 'axionCMB_path
 if os.path.exists(axionCAMB_exe_path+'/./camb') == False:
-    print("executabel axionCAMB is not in the given directory, pleas check the path")
+    print("executable axionCAMB is not in the given directory, please check the path")
       
     
 ################################################################################    
-# save cosmological parameter in a dictionary 
+# save cosmological parameters in a dictionary 
 ################################################################################
 cosmos = load_cosmology.load_cosmology_input(input_file_path) 
 cosmos_LCDM = load_cosmology.load_LCDM_cosmology_input(input_file_path)
@@ -64,7 +64,7 @@ print("omega_m = {0} \nomega_cdm = {1} \nomega_ax = {2} \nomega_b = {3} \nm_ax =
 # Run axionCAMB on mixed and LCDM cosmology 
 ################################################################################
 print('-' * 50)
-print("axionCAMB is running. Computes transfer function for cosmology with a axion fraction of {}"
+print("axionCAMB is running. Computes transfer function for cosmology with an axion fraction of {}"
       .format(cosmos['Omega_ax_0']/(cosmos['Omega_ax_0']+cosmos['Omega_d_0'])))
 axionCAMB_wrapper.axioncamb_params('paramfiles/paramfile_axionCAMB.txt', 
                                    cosmos, output_root='paramfiles/cosmos', print_info = False)
