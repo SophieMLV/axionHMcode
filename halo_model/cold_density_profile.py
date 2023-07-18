@@ -39,7 +39,7 @@ def func_z_formation(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, f = 0.01):
 
 
 
-def func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma):
+def func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, axion_dic=None):
     """
     k_sigma is in units of h/Mpc, PS_sigma in (Mpc/h)^3 and M in solar_mass/h
     NOTE: Omega_0 must match with chosen PS_sigma
@@ -47,16 +47,28 @@ def func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma):
     https://arxiv.org/abs/2009.01858 in eq. 20
     """
     B = 4.#5.196
-    if 'gamma_1' in cosmo_dic and 'gamma_2' in cosmo_dic:
-        # Implementing 2111.01199 Eq. (33) for mixed dark matter 
+    '''if 'gamma_1' in cosmo_dic and 'gamma_2' in cosmo_dic:
+        # Implementing 2111.01199 Eq. (33) for mixed dark matter
+        #Only apply correction for cold DM halos > M_cut
+        if axion_dic == 'ignore':
+            #print('Assuming axions affect arbitrarily low-mass cold halos')
+            correction_array = np.ones_like(M)
+        else:
+            cold_halo_cut = axion_dic['M_cut'] * cosmo_dic['omega_d_0'] / cosmo_dic['omega_ax_0']
+            correction_array = (M > cold_halo_cut)
+
         gamma_1 = cosmo_dic['gamma_1']
         gamma_2 = cosmo_dic['gamma_2']
         f_ax = cosmo_dic['omega_ax_0'] / (cosmo_dic['omega_ax_0']+cosmo_dic['omega_d_0'])
         M0 = 1.6e10 * (cosmo_dic['m_ax']/1e-22)**(-4/3) * cosmo_dic['h'] # to convert to Msun/h
-        factor = 1 - f_ax + f_ax * (1+gamma_1*M0/M)**(-gamma_2)
+        factor = 1 + (f_ax * (((1+gamma_1*M0/M)**(-gamma_2)) - 1.) * correction_array)
+        #print('Gamma correction =', factor)
         B *= factor
-        
-    return  B * (1 + func_z_formation(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) )/(1+cosmo_dic['z']) 
+    '''
+
+    conc_param = B * (1 + func_z_formation(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) )/(1+cosmo_dic['z']) 
+    #print('Concentration - mass relation =', conc_param, M)
+    return conc_param
 
 
 #function for the normaliation factor in NFW profile
@@ -68,7 +80,7 @@ def func_for_norm_factor(x):
 
 
 #density profile in k space (fourietrafo)
-def func_dens_profile_kspace(M, k, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = False):
+def func_dens_profile_kspace(M, k, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = False, axion_dic=None):
     """
     k, k_sigma units of h/Mpc, M in solar_mass/h and PS, PS_sigma in (Mpc/h)^3 
     NOTE: be carefull, we have two k's: k is the k, where the function is evaluated 
@@ -85,7 +97,7 @@ def func_dens_profile_kspace(M, k, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Ome
         nu = 1.
     
     R_vir = func_r_vir(cosmo_dic['z'], M, Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'])
-    concentration = func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) / (nu**eta)
+    concentration = func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, axion_dic=axion_dic) / (nu**eta)
     k_R_vir = np.outer(R_vir, k)
     a = np.outer(R_vir/concentration, k)
     
@@ -104,7 +116,7 @@ def func_dens_profile_kspace(M, k, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Ome
 
 
 #delta_char for the NFW profile
-def func_delta_char(M, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = False): 
+def func_delta_char(M, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = False, axion_dic=None): 
     """
     k_sigma units of h/Mpc, M in solar_mass/h and PS_sigma in (Mpc/h)^3 
     returns NFW profile in h^2 * M_sun/Mpc^3 at k in h/Mpc
@@ -119,13 +131,13 @@ def func_delta_char(M, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_
         nu = 1.   
     Delta_vir = func_Delta_vir(cosmo_dic['z'], Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'])
     
-    concentration = func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) / (nu**eta)
+    concentration = func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, axion_dic=axion_dic) / (nu**eta)
     delta_char = func_rho_comp_0(Omega_0) * Delta_vir * concentration **3 / (3. * func_for_norm_factor(concentration))
     return delta_char
 
 
 #density profile in real space
-def NFW_profile(M, r, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = False):
+def NFW_profile(M, r, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = False, axion_dic=None):
     """
     r in units of Mpc/h, k_sigma in h/Mpc, M in solar_mass/h PS_sigma in (Mpc/h)^3
     returns NFW denisty profile in units of solar_mass/Mpc^3*h^2 at radius r
@@ -138,8 +150,8 @@ def NFW_profile(M, r, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0
         eta = np.array([0.]) 
         nu = 1.
         
-    concentration = func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) / (nu**eta)
-    normalisation = func_delta_char(M, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = eta_given) 
+    concentration = func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, axion_dic=axion_dic) / (nu**eta)
+    normalisation = func_delta_char(M, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = eta_given, axion_dic=axion_dic)
     r_s = func_r_vir(cosmo_dic['z'], M, Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0']) / concentration
     
     NFW_func = 1 /((r/r_s) * (1+r/r_s)**2)
