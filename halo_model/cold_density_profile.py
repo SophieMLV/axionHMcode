@@ -47,15 +47,15 @@ def func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, axion_dic=No
     https://arxiv.org/abs/2009.01858 in eq. 20
     """
     B = 4.#5.196
-    '''if 'gamma_1' in cosmo_dic and 'gamma_2' in cosmo_dic:
+    if 'gamma_1' in cosmo_dic and 'gamma_2' in cosmo_dic:
         # Implementing 2111.01199 Eq. (33) for mixed dark matter
         #Only apply correction for cold DM halos > M_cut
         if axion_dic == 'ignore':
             #print('Assuming axions affect arbitrarily low-mass cold halos')
             correction_array = np.ones_like(M)
         else:
-            cold_halo_cut = axion_dic['M_cut'] * cosmo_dic['omega_d_0'] / cosmo_dic['omega_ax_0']
-            correction_array = (M > cold_halo_cut)
+            #cold_halo_cut = axion_dic['M_cut'] * cosmo_dic['omega_d_0'] / cosmo_dic['omega_ax_0']
+            correction_array = (M > axion_dic['M_cut'])
 
         gamma_1 = cosmo_dic['gamma_1']
         gamma_2 = cosmo_dic['gamma_2']
@@ -64,7 +64,6 @@ def func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, axion_dic=No
         factor = 1 + (f_ax * (((1+gamma_1*M0/M)**(-gamma_2)) - 1.) * correction_array)
         #print('Gamma correction =', factor)
         B *= factor
-    '''
 
     conc_param = B * (1 + func_z_formation(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) )/(1+cosmo_dic['z']) 
     #print('Concentration - mass relation =', conc_param, M)
