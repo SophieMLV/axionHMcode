@@ -46,7 +46,7 @@ def func_full_halo_model_ax(M, power_spec_dic, power_spec_dic_sigma, cosmo_dic, 
     dens_profile_cold_arr_2 = func_dens_profile_kspace(axion_dic['M_int'], k, k_sigma, PS_cold_sigma, cosmo_dic, hmcode_dic, cosmo_dic['Omega_db_0'], 
                                                        cosmo_dic['Omega_db_0'], eta_given=eta_given) # for the integral over reduced array [M_cut, inf]
     dens_profile_ax_arr_2 = func_dens_profile_ax_kspace(k, axion_dic['M_int'], cosmo_dic, power_spec_dic, axion_dic['M_cut'], axion_dic['central_dens'], 
-                                                        eta_given=eta_given) # this integral in only in the reduced one
+                                                        eta_given=False) # this integral in only in the reduced one
     
     halo_bias_arr = func_halo_bias(M, k_sigma, PS_cold_sigma, cosmo_dic, cosmo_dic['Omega_db_0']) # for the integral over M ~[0, inf]
     halo_bias_arr_2 = func_halo_bias(axion_dic['M_int'], k_sigma, PS_cold_sigma, cosmo_dic, cosmo_dic['Omega_db_0']) # for the integral over reduced array [M_cut, inf]
