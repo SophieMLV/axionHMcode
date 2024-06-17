@@ -8,7 +8,7 @@ from halo_model.halo_mass_function import *
 from halo_model.axion_density_profile import *
 
 
-def func_axion_param_dic(M, cosmo_dic, power_spec_dic_sigma, eta_given=False):
+def func_axion_param_dic(M, cosmo_dic, power_spec_dic_sigma):
     """
     generate dictionary with parameters for axions
     M_halo is the mass of the cold matter halo in solar_mass/h
@@ -20,7 +20,7 @@ def func_axion_param_dic(M, cosmo_dic, power_spec_dic_sigma, eta_given=False):
     #cold halo masses for which an axion halo exists
     axion_param_dic['M_int'] = np.geomspace(axion_param_dic['M_cut'], np.max(M), num=len(M))
     #central density parameter, to ensure, that the axion halo has the correct mass
-    axion_param_dic['central_dens'] = func_central_density_param(axion_param_dic['M_int'], cosmo_dic, power_spec_dic_sigma, axion_param_dic['M_cut'], eta_given=eta_given)
+    axion_param_dic['central_dens'] = func_central_density_param(axion_param_dic['M_int'], cosmo_dic, power_spec_dic_sigma, axion_param_dic['M_cut'], eta_given=False)
     
     #for some halo mass no central density parameter can be found, ie there is no axion halo for this halo mass and M_int must be reduced
     axion_param_dic['M_int'] = axion_param_dic['M_int'] * np.where(np.array(axion_param_dic['central_dens']) <= 0, 0, 1) #set mass to zero, if central densit param is zero
