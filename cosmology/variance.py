@@ -68,7 +68,7 @@ def func_nu(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma):
     return delta_c/func_sigma_M(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma)
 
 
-def func_R_nonlin(cosmo_dic, k, PS):
+def func_R_nonlin(k, PS):
     """
     k is in units of h/Mpc and PS in (Mpc/h)^3
     returns the nonlinear scale in Mpc/h defined by
