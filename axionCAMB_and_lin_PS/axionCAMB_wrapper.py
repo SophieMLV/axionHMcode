@@ -11,21 +11,26 @@ import fileinput
 
 #create param infile for axionCAMB
 def axioncamb_params(params_path, arg_dic={}, print_info = True,
-                output_root='test', get_scalar_cls='F',
+                ombh2=0.0224, omch2=0.12, omnuh2=0, omk=0, hubble=67.4,  
+                omaxh2=0.001, m_ax=1.e-26, 
+                scalar_amp__1___=2.1e-9, pivot_scalar=0.05, 
+                scalar_spectral_index__1___=0.965,
+                transfer_kmax=1000,
+                transfer_redshift__1___=0,
+                output_root='test', 
+                get_scalar_cls='F',
                 get_vector_cls='F', get_tensor_cls='F', get_transfer='T',
                 do_lensing='F', do_nonlinear=0,
                 l_max_scalar=4000, k_eta_max_scalar=5000,
                 l_max_tensor=1500, k_eta_max_tensor=3000, use_physical='T',
-                ombh2=0.0224, omch2=0.12, omnuh2=0, omk=0, hubble=67.4,
                 axion_isocurvature='F', alpha_ax=0, Hinf=13.7,
                 w=-1, use_axfrac='F',
-                omaxh2=0.001, m_ax=1.e-26,
                 cs2_lam=1, temp_cmb=2.726, helium_fraction=0.24,
                 massless_neutrinos=3.046, massive_neutrinos=0,
                 nu_mass_eigenstates=1, nu_mass_fractions=1, share_delta_neff='T',
-                initial_power_num=1, pivot_scalar=0.05,
-                pivot_tensor=0.05, scalar_amp__1___=2.1e-9,
-                scalar_spectral_index__1___=0.965, scalar_nrun__1___=0,
+                initial_power_num=1,
+                pivot_tensor=0.05, 
+                scalar_nrun__1___=0,
                 tensor_spectral_index__1___=0,
                 initial_ratio__1___=0, tens_ratio=0,
                 reionization='T', re_use_optical_depth='T',
@@ -34,10 +39,8 @@ def axioncamb_params(params_path, arg_dic={}, print_info = True,
                 RECFAST_fudge=1.14, RECFAST_fudge_He=0.86, RECFAST_Heswitch=6,
                 RECFAST_Hswitch='T', initial_condition=1,
                 initial_vector='-1 0 0 0 0', vector_mode=0, COBE_normalize='F',
-                CMB_outputscale=7.4311e12, transfer_high_precision='F',
-                transfer_kmax=1000, transfer_k_per_logint=0,
-                transfer_num_redshifts=1, transfer_interp_matterpower='T',
-                transfer_redshift__1___=0, transfer_filename__1___='transfer_out.dat',
+                CMB_outputscale=7.4311e12, transfer_high_precision='F', transfer_k_per_logint=0,
+                transfer_num_redshifts=1, transfer_interp_matterpower='T', transfer_filename__1___='transfer_out.dat',
                 transfer_matterpower__1___='matterpower.dat',
                 scalar_output_file='scalCls.dat', vector_output_file='vecCls.dat',
                 tensor_output_file='tensCls.dat', total_output_file='totCls.dat',
@@ -59,9 +62,8 @@ def axioncamb_params(params_path, arg_dic={}, print_info = True,
                 number_of_threads=0, high_accuracy_default='F',
                 accuracy_boost=1, l_accuracy_boost=1, l_sample_boost=1):
     """
-    Define a dictionary of all parameters in axionCAMB, set to their default values.
+    Define a file with all parameters for running axionCAMB.
     Change some of them (if given) by the values in a given dictionary arg_dic
-    otherwise save the default values in a dictionary and return it
     file is saved in given path: params_path
     """
     # Get dict. of arguments 
@@ -120,22 +122,16 @@ def axioncamb_params(params_path, arg_dic={}, print_info = True,
             else:
                 line='='.join(sline) 
             print(line)
-        return arg_dic
-    else:
-        arg_dic = {'omega_b_0': ombh2, 'omega_d_0': omch2, 'omega_db_0': omch2+ombh2, 'omega_ax_0': omaxh2, 'omega_m_0': omch2+ombh2+omaxh2, 
-                'm_ax': m_ax, 'h': hubble/100., 'z': transfer_redshift__1___, 
-                'Omega_b_0': ombh2/(hubble/100)**2, 'Omega_d_0': omch2/(hubble/100)**2, 'Omega_ax_0': omaxh2/(hubble/100)**2, 'Omega_db_0': (ombh2+omch2)/(hubble/100)**2, 
-                'Omega_m_0': (ombh2+omch2+omaxh2)/(hubble/100)**2, 'Omega_w_0': 1-(ombh2+omch2+omaxh2)/(hubble/100)**2, 
-                'ns': scalar_spectral_index__1___, 'As': scalar_amp__1___, 'k_piv': pivot_scalar, 'transfer_kmax': transfer_kmax}
-        return arg_dic
+
     
 
 def run_axioncamb(params_path, camb_exec_dir, arg_dic, print_info = True):
     """
-    Run axionCAMB, using a given (pre-written) params file (see axioncamb_params).
-    Waits for axionCAMB to finish before returning.
+    Run axionCAMB, using a given (pre-written) params file (see axioncamb_params)
+    stored in the file name params_path.
     The camb_exec_dir is the absolute path to the directory of your axionCAMB executable.
     The arg_dic musst be the dictionary retured from the function axioncamb_params
+    All 
     """
     
     cwd = os.getcwd()
