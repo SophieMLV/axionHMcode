@@ -67,8 +67,8 @@ def func_power_spec_dic(file_path, cosmo_dic):
     power_spec_dic['power_total'] = transfer_to_PS(transfer_dic['k'], transfer_dic['transfer_total'], cosmo_dic) 
     power_spec_dic['power_CDM'] = transfer_to_PS(transfer_dic['k'], transfer_dic['transfer_CDM'], cosmo_dic) 
     power_spec_dic['power_baryon'] = transfer_to_PS(transfer_dic['k'], transfer_dic['transfer_baryon'], cosmo_dic) 
-    #for the cold matter PS the cold matter transfer function is need: T_cold = (T_cdm*Omega_cdm + T_b*Omega_b)/(Omega_cdm+Omega_b)
-    power_spec_dic['cold'] = transfer_to_PS(transfer_dic['k'],
+    #for the cold matter PS the cold matter transfer function is: T_cold = (T_cdm*Omega_cdm + T_b*Omega_b)/(Omega_cdm+Omega_b)
+    power_spec_dic['power_cold'] = transfer_to_PS(transfer_dic['k'],
                                             (cosmo_dic['Omega_b_0']*transfer_dic['transfer_baryon'] + \
                                              cosmo_dic['Omega_d_0']*transfer_dic['transfer_CDM'])/cosmo_dic['Omega_db_0'], 
                                              cosmo_dic)

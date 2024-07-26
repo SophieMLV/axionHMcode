@@ -27,10 +27,10 @@ def func_full_halo_model_ax(M, power_spec_dic, power_spec_dic_sigma, cosmo_dic, 
     returns total non-linear matter power spectrum in (Mpc/h)^3 at k
     """ 
     k = power_spec_dic['k']
-    PS_cold = power_spec_dic['cold']
+    PS_cold = power_spec_dic['power_cold']
     PS_ax = power_spec_dic['power_axion']
     k_sigma = power_spec_dic_sigma['k']
-    PS_cold_sigma = power_spec_dic_sigma['cold']
+    PS_cold_sigma = power_spec_dic_sigma['power_cold']
     ############# Cold matter term ##########
     PS_cold_nonlin = func_non_lin_PS_matter(M, k, PS_cold, k_sigma, PS_cold_sigma, cosmo_dic, hmcode_dic, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_db_0'], 
                                             alpha = alpha, eta_given = eta_given, ax_one_halo=False, one_halo_damping = one_halo_damping, two_halo_damping = two_halo_damping)[0]

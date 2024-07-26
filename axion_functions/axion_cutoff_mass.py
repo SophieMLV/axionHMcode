@@ -22,7 +22,7 @@ def func_halo_jeans_kscale(M, cosmo_dic, power_spec_dic_sigma):
     z = cosmo_dic['z']
     m_ax = cosmo_dic['m_ax']
     omega_cold = cosmo_dic['omega_db_0']
-    concentration = func_conc_param(M, power_spec_dic_sigma['k'], power_spec_dic_sigma['cold'], 
+    concentration = func_conc_param(M, power_spec_dic_sigma['k'], power_spec_dic_sigma['power_cold'], 
                                     cosmo_dic, cosmo_dic['Omega_db_0'])
     form_factor = func_for_norm_factor(concentration) 
     M_in_formula = M / cosmo_dic['h'] # note that we need solar_mass units for M in the formula
