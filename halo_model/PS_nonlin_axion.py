@@ -13,13 +13,15 @@ from PS_nonlin_cold import *
 
 
 
-def func_full_halo_model_ax(M, power_spec_dic, power_spec_dic_sigma, cosmo_dic, hmcode_dic, axion_dic, 
+def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic, 
                             alpha = False, eta_given = False, one_halo_damping = True, two_halo_damping = False):
     """ 
-    My Full Halo Model with Axions, see my masterhesis eq 5.2-5.10 to see the full formula
+    Full Halo Model with Axions, see BLA for the full formula
     all modifications form HMcode2020 https://arxiv.org/abs/2009.01858 can be used (if wanted)
     by default use only the damping in the one halo term on large scales (for all parts) 
     to ensure the correct behaviour on large scales
+    all other HMcode2020 modifications are only apllied to the cold part 
+    because they are only calibrated to CDM.
     M in solar_mass/h
     in power_spec_dic and power_spec_dic_sigma the PS and k's are stored 
     and all units are either in (Mpc/h)^3 or h/Mpc
@@ -29,27 +31,25 @@ def func_full_halo_model_ax(M, power_spec_dic, power_spec_dic_sigma, cosmo_dic, 
     k = power_spec_dic['k']
     PS_cold = power_spec_dic['power_cold']
     PS_ax = power_spec_dic['power_axion']
-    k_sigma = power_spec_dic_sigma['k']
-    PS_cold_sigma = power_spec_dic_sigma['power_cold']
     ############# Cold matter term ##########
-    PS_cold_nonlin = func_non_lin_PS_matter(M, k, PS_cold, k_sigma, PS_cold_sigma, cosmo_dic, hmcode_dic, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_db_0'], 
+    PS_cold_nonlin = func_non_lin_PS_matter(M, k, PS_cold, cosmo_dic, hmcode_dic, cosmo_dic['Omega_db_0'], 
                                             alpha = alpha, eta_given = eta_given, ax_one_halo=False, one_halo_damping = one_halo_damping, two_halo_damping = two_halo_damping)[0]
     
     ##compute all ingridients for the diff halo model parts##
-    halo_mass_func_arr = func_halo_mass_function(M, k_sigma, PS_cold_sigma, cosmo_dic, 
-                                                 cosmo_dic['Omega_db_0'], cosmo_dic['Omega_db_0']) # for the integral over M ~[0, inf]
-    halo_mass_func_arr_2 = func_halo_mass_function(axion_dic['M_int'], k_sigma, PS_cold_sigma, cosmo_dic, 
-                                                   cosmo_dic['Omega_db_0'], cosmo_dic['Omega_db_0']) # for the integral over reduced array [M_cut, inf]
+    halo_mass_func_arr = func_halo_mass_function(M, k, PS_cold, cosmo_dic, 
+                                                 cosmo_dic['Omega_db_0']) # for the integral over M ~[0, inf]
+    halo_mass_func_arr_2 = func_halo_mass_function(axion_dic['M_int'], k, PS_cold, cosmo_dic, 
+                                                   cosmo_dic['Omega_db_0']) # for the integral over reduced array [M_cut, inf]
     
-    dens_profile_cold_arr = func_dens_profile_kspace(M, k, k_sigma, PS_cold_sigma, cosmo_dic, hmcode_dic, cosmo_dic['Omega_db_0'], 
+    dens_profile_cold_arr = func_dens_profile_kspace(M, k, PS_cold, cosmo_dic, hmcode_dic, 
                                                      cosmo_dic['Omega_db_0'], eta_given = eta_given) # for the integral over M ~[0, inf]
-    dens_profile_cold_arr_2 = func_dens_profile_kspace(axion_dic['M_int'], k, k_sigma, PS_cold_sigma, cosmo_dic, hmcode_dic, cosmo_dic['Omega_db_0'], 
+    dens_profile_cold_arr_2 = func_dens_profile_kspace(axion_dic['M_int'], k, PS_cold, cosmo_dic, hmcode_dic, 
                                                        cosmo_dic['Omega_db_0'], eta_given=eta_given) # for the integral over reduced array [M_cut, inf]
     dens_profile_ax_arr_2 = func_dens_profile_ax_kspace(k, axion_dic['M_int'], cosmo_dic, power_spec_dic, axion_dic['M_cut'], axion_dic['central_dens'], 
                                                         eta_given=False) # this integral in only in the reduced one
     
-    halo_bias_arr = func_halo_bias(M, k_sigma, PS_cold_sigma, cosmo_dic, cosmo_dic['Omega_db_0']) # for the integral over M ~[0, inf]
-    halo_bias_arr_2 = func_halo_bias(axion_dic['M_int'], k_sigma, PS_cold_sigma, cosmo_dic, cosmo_dic['Omega_db_0']) # for the integral over reduced array [M_cut, inf]
+    halo_bias_arr = func_halo_bias(M, k, PS_cold, cosmo_dic, cosmo_dic['Omega_db_0']) # for the integral over M ~[0, inf]
+    halo_bias_arr_2 = func_halo_bias(axion_dic['M_int'], k, PS_cold, cosmo_dic, cosmo_dic['Omega_db_0']) # for the integral over reduced array [M_cut, inf]
     
     ### cross one halo term ###
     integrand_arr_one_halo_cross = axion_dic['M_int'][:, None] * axion_dic['M_ax'][:, None] * halo_mass_func_arr_2[:, None]\
@@ -68,7 +68,7 @@ def func_full_halo_model_ax(M, power_spec_dic, power_spec_dic_sigma, cosmo_dic, 
     integrand_arr_two_halo_2_cross = axion_dic['M_ax'][:, None] * halo_mass_func_arr_2[:, None] * halo_bias_arr_2[:, None] * dens_profile_ax_arr_2 # integral over reduced array [M_cut, inf]
     
     #summand2_cross to take care of nummericals issues of the integral, see appendix A in https://arxiv.org/abs/2005.00009
-    summand2_cross = func_dens_profile_kspace(np.min(M), k, k_sigma, PS_cold_sigma, cosmo_dic, hmcode_dic, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_db_0'], eta_given = eta_given) \
+    summand2_cross = func_dens_profile_kspace(np.min(M), k, PS_cold, cosmo_dic, hmcode_dic, cosmo_dic['Omega_db_0'], eta_given = eta_given) \
                      * ( 1 - integrate.simps(M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None], x = M, axis = 0) \
                      / func_rho_comp_0(cosmo_dic['Omega_db_0']) ) 
     factor2_cross = integrate.simps(integrand_arr_two_halo_cross, x = M, axis = 0) / func_rho_comp_0(cosmo_dic['Omega_db_0']) + summand2_cross
@@ -93,7 +93,8 @@ def func_full_halo_model_ax(M, power_spec_dic, power_spec_dic_sigma, cosmo_dic, 
         one_halo_term_ax = integrate.simps(integrand_arr_one_halo_ax, x = axion_dic['M_int'], axis = 0) \
                            / (func_rho_comp_0(cosmo_dic['Omega_ax_0']) * axion_dic['frac_cluster'])**2 
         
-    two_halo_term_ax =  PS_cold\
+    # two_halo_term_ax =  PS_cold\
+    two_halo_term_ax =  PS_ax\
                         * integrate.simps(integrand_arr_two_halo_ax, x = axion_dic['M_int'], axis = 0)**2 \
                         / (func_rho_comp_0(cosmo_dic['Omega_ax_0']) * axion_dic['frac_cluster'])**2 
     

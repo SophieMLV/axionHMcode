@@ -33,7 +33,7 @@ def func_axion_param_dic(M, cosmo_dic, power_spec_dic_sigma):
     #not all axions cluster. Compute clustered fraction by f = 1/\rho_ax * int_Mcut^\inf n(M)*b(M)*M_ax(M) dM, see masterthesis eq.
     k = power_spec_dic_sigma['k']
     PS_cold = power_spec_dic_sigma['power_cold']
-    integrand_arr = func_halo_mass_function(axion_param_dic['M_int'], k, PS_cold , cosmo_dic, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_db_0']) * \
+    integrand_arr = func_halo_mass_function(axion_param_dic['M_int'], k, PS_cold , cosmo_dic, cosmo_dic['Omega_db_0']) * \
                     axion_param_dic['M_ax'] * \
                     func_halo_bias(axion_param_dic['M_int'], k, PS_cold, cosmo_dic, cosmo_dic['Omega_db_0'])
     axion_param_dic['frac_cluster'] = integrate.simps(y= integrand_arr, x = axion_param_dic['M_int'])/ func_rho_comp_0(cosmo_dic['Omega_ax_0'])
