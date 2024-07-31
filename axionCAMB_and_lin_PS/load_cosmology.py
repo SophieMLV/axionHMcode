@@ -12,15 +12,26 @@ def load_cosmology_input(params_path):
     musst be given in a new line
     """
     cosmo_dic = {}
+    # default values
+    cosmo_dic['M_min'] = 1e8
+    cosmo_dic['M_max'] = 1e17
+    cosmo_dic['transfer_kmax'] = 1e3
     file = open(params_path)
     for line in file:
         line = line.split('=')
         if line[0] == '\n':
             continue
-        elif line[0].strip() == 'omega_b_0': 
-            cosmo_dic['omega_b_0'] = eval(line[1].strip())
-        elif line[0].strip() == 'omega_d_0': 
-            total_dark = eval(line[1].strip())
+        elif line[0].strip() == 'omega_b_0' or line[0].strip() == 'Omega_b_0': 
+            if line[0].strip() == 'omega_b_0':
+                cosmo_dic['omega_b_0'] = eval(line[1].strip())
+            else:
+                cosmo_dic['Omega_b_0'] = eval(line[1].strip())
+        elif line[0].strip() == 'omega_d_0' or line[0].strip() == 'Omega_d_0': 
+            if line[0].strip() == 'omega_d_0':
+                total_dark = eval(line[1].strip()) # when reduced density param is given: Omega_i*h^2
+            else:
+                Total_Dark = eval(line[1].strip()) # when denisty parame Omega is given
+            
         elif line[0].strip() == 'ax_fraction':
             cosmo_dic['omega_ax_0'] = total_dark * eval(line[1].strip())
             cosmo_dic['omega_d_0'] = total_dark - cosmo_dic['omega_ax_0']
@@ -38,18 +49,19 @@ def load_cosmology_input(params_path):
             cosmo_dic['Omega_w_0'] = 1 - cosmo_dic['Omega_m_0']
         elif line[0].strip() == 'z':
             cosmo_dic['z'] = eval(line[1].strip())   
-        elif line[0].strip() == 'M_min':
-            cosmo_dic['M_min'] = eval(line[1].strip())
-        elif line[0].strip() == 'M_max':
-            cosmo_dic['M_max'] = eval(line[1].strip())
         elif line[0].strip() == 'ns':
             cosmo_dic['ns'] = eval(line[1].strip())
         elif line[0].strip() == 'As':
             cosmo_dic['As'] = eval(line[1].strip())  
         elif line[0].strip() == 'k_piv':
             cosmo_dic['k_piv'] = eval(line[1].strip())
+
         elif line[0].strip() == 'transfer_kmax':
-            cosmo_dic['transfer_kmax'] = eval(line[1].strip())  
+            cosmo_dic['transfer_kmax'] = eval(line[1].strip()) 
+        elif line[0].strip() == 'M_min':
+            cosmo_dic['M_min'] = eval(line[1].strip())
+        elif line[0].strip() == 'M_max':
+            cosmo_dic['M_max'] = eval(line[1].strip()) 
         elif line[0].split()[0] == '#':
             continue   
     file.close()

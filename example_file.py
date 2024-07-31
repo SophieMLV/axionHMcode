@@ -102,8 +102,8 @@ M_arr = np.logspace(cosmos['M_min'], cosmos['M_max'], 100)
 print("Calculate axion quantities; cut-off mass, central density scale of axion density profile and axion halo mass.")
 axion_param = axion_params.func_axion_param_dic(M_arr, cosmos, power_spec_interp_dic_ax)
 print("Create dictionary with parameters of HMCode2020")
-hmcode_params = HMcode_params.HMCode_param_dic(cosmos, power_spec_interp_dic_ax['k'], power_spec_interp_dic_ax['cold'])
-hmcode_params_LCDM = HMcode_params.HMCode_param_dic(cosmos_LCDM, power_spec_interp_dic_LCDM['k'], power_spec_interp_dic_LCDM['cold'])
+hmcode_params = HMcode_params.HMCode_param_dic(cosmos, power_spec_interp_dic_ax['k'], power_spec_interp_dic_ax['power_cold'])
+hmcode_params_LCDM = HMcode_params.HMCode_param_dic(cosmos_LCDM, power_spec_interp_dic_LCDM['k'], power_spec_interp_dic_LCDM['power_cold'])
 print("computation time upto here: {:.0f} s".format(time.time() -start))
 
 
@@ -117,7 +117,7 @@ PS_matter_nonlin = PS_nonlin_axion.func_full_halo_model_ax(M_arr, power_spec_dic
 
 print('Caluclate non-linear power spectrum in LCDM cosmology with the halo model')
 PS_LCDM_matter_nonlin = PS_nonlin_cold.func_non_lin_PS_matter(M_arr, power_spec_dic_LCDM['k'], power_spec_dic_LCDM['power_total'], 
-                                                              power_spec_interp_dic_LCDM['k'], power_spec_interp_dic_LCDM['cold'], 
+                                                              power_spec_interp_dic_LCDM['k'], power_spec_interp_dic_LCDM['power_cold'], 
                                                               cosmos_LCDM, hmcode_params_LCDM, cosmos_LCDM['Omega_m_0'], 
                                                               cosmos_LCDM['Omega_db_0'], 
                                                               alpha = False, 
