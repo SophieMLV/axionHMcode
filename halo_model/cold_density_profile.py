@@ -60,8 +60,6 @@ def func_for_norm_factor(x):
 def func_dens_profile_kspace(M, k, PS, cosmo_dic, hmcode_dic, Omega_0, eta_given = False):
     """
     k, k units of h/Mpc, M in solar_mass/h and PS, PS in (Mpc/h)^3 
-    NOTE: be carefull, we have two k's: k is the k, where the function is evaluated 
-    and k is needed for for sigma(M, z) (the same is true for the PSs)
     NOTE: Omega_0 must match with chosen PS
     returns Fourier trafo of NFW profile (dimensionless) at k as given in my masterthesis eq. 4.20
     """
