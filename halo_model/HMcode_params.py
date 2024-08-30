@@ -79,17 +79,17 @@ def func_alpha_param(cosmo_dic, k, PS_cold, LCDM=True):
 
 
 
-def HMCode_param_dic(cosmo_dic, k_sigma, PS_cold_sigma):
+def HMCode_param_dic(cosmo_dic, k, PS_cold):
     """
     generate dictonary with parameetrs 
     as in HMCode2020: https://arxiv.org/abs/2009.01858 in table 2
     """
     param_model_dic = {}
-    param_model_dic['k_d'] = func_k_d(k_sigma, PS_cold_sigma)
-    param_model_dic['f'] = func_f_dewiggle(k_sigma, PS_cold_sigma)
+    param_model_dic['k_d'] = func_k_d(k, PS_cold)
+    param_model_dic['f'] = func_f_dewiggle(k, PS_cold)
     param_model_dic['n_d'] = 2.853
-    param_model_dic['k_star'] = func_k_star(k_sigma, PS_cold_sigma)
-    param_model_dic['eta'] = func_eta(k_sigma, PS_cold_sigma)
-    param_model_dic['alpha'] = func_alpha_param(cosmo_dic, k_sigma, PS_cold_sigma)
+    param_model_dic['k_star'] = func_k_star(k, PS_cold)
+    param_model_dic['eta'] = func_eta(k, PS_cold)
+    param_model_dic['alpha'] = func_alpha_param(cosmo_dic, k, PS_cold)
     
     return param_model_dic

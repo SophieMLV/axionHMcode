@@ -7,7 +7,7 @@ import numpy as np
 from scipy import integrate
 
 #own packages
-from basic_cosmology import *
+from .basic_cosmology import *
 
 
 def func_D_z_unnorm(z, cosmo_dic):

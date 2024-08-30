@@ -5,11 +5,11 @@ import numpy as np
 from scipy import integrate
 #own pachages
 from cosmology.basic_cosmology import *
-from halo_bias import *
-from halo_mass_function import *
-from cold_density_profile import *
-from axion_density_profile import *
-from PS_nonlin_cold import *
+from .halo_bias import *
+from .halo_mass_function import *
+from .cold_density_profile import *
+from .axion_density_profile import *
+from .PS_nonlin_cold import *
 
 
 

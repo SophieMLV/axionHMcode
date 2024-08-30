@@ -4,7 +4,7 @@ form the tranfer functions given from axionCAMB
 """
 import numpy as np
 import sys
-from PS_interpolate import *
+from .PS_interpolate import *
 
 def primordial_PS(k, initial_amplitude, k_pivot, scalar_index, hubble):
     """

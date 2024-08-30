@@ -7,8 +7,8 @@ import numpy as np
 from scipy import integrate, optimize
 
 #own pachages
-from basic_cosmology import *
-from overdensities import *
+from .basic_cosmology import *
+from .overdensities import *
 
 
 def spherical_tophat_window_function(R, k, conditional_return=True):
@@ -36,15 +36,15 @@ def func_sigma_r(R, k, PS):
     return np.sqrt(sigma_squared)
 
 
-def func_sigma_squared_damping_twohalo(k_sigma, PS_sigma): 
+def func_sigma_squared_damping_twohalo(k, PS_cold): 
     """
     k is in units of h/Mpc and PS in (Mpc/h)^3.
     returns linear variance as in https://arxiv.org/pdf/2009.01858.pdf eq 10 
     in the limit R -> 0
     this is needed for the 
     """   
-    integrand = PS_sigma
-    sigma_squared = integrate.simps(y=integrand, x=k_sigma, axis=-1) / (2. * np.pi ** 2)
+    integrand = PS_cold
+    sigma_squared = integrate.simps(y=integrand, x=k, axis=-1) / (2. * np.pi ** 2)
     
     return 1/3 * sigma_squared
   
@@ -59,13 +59,13 @@ def func_sigma_M(M, k, PS, cosmo_dic, Omega_0):
     return func_sigma_r(R, k, PS)
 
 
-def func_nu(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma):
+def func_nu(M, k, PS_cold, cosmo_dic, Omega_0_sigma):
     """
-    k_sigma is in units of h/Mpc, PS_sigma in (Mpc/h)^3 and M in solar_mass/h,
-    NOTE: Omega_0 must match with chosen PS_sigma
+    k is in units of h/Mpc, PS_cold in (Mpc/h)^3 and M in solar_mass/h,
+    NOTE: Omega_0 must match with chosen PS_cold
     """
     delta_c = func_delta_c(cosmo_dic)
-    return delta_c/func_sigma_M(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma)
+    return delta_c/func_sigma_M(M, k, PS_cold, cosmo_dic, Omega_0_sigma)
 
 
 def func_R_nonlin(k, PS):
