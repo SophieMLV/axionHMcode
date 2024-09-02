@@ -93,8 +93,7 @@ def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic,
         one_halo_term_ax = integrate.simps(integrand_arr_one_halo_ax, x = axion_dic['M_int'], axis = 0) \
                            / (func_rho_comp_0(cosmo_dic['Omega_ax_0']) * axion_dic['frac_cluster'])**2 
         
-    # two_halo_term_ax =  PS_cold\
-    two_halo_term_ax =  PS_ax\
+    two_halo_term_ax =  PS_cold\
                         * integrate.simps(integrand_arr_two_halo_ax, x = axion_dic['M_int'], axis = 0)**2 \
                         / (func_rho_comp_0(cosmo_dic['Omega_ax_0']) * axion_dic['frac_cluster'])**2 
     
