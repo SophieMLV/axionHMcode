@@ -37,8 +37,8 @@ def func_dlnsigma2_dlnM(M, k, PS, cosmo_dic, Omega_0):
     k units of h/Mpc, M in solar_mass/h and PS in (Mpc/h)^3 
     returns integral for the halo mass function as in my masterthesis eq. 4.23
     """
-    R = func_R_M(M, cosmo_dic, Omega_0) #translate M into R 
-    sigma = func_sigma_M(M, k, PS, cosmo_dic, Omega_0)
+    R = func_R_M(M, Omega_0) #translate M into R 
+    sigma = func_sigma_M(M, k, PS, Omega_0)
 
     integrand = func_term_derivative_sigma2_M(R, k) * PS / k**2
     
@@ -51,6 +51,17 @@ def func_halo_mass_function(M, k, PS, cosmo_dic, Omega_0):
     returns halo mass functions in untits h^4/(M_sun Mpc^3)
     with teh definition as in my  masterthesis eq. 4.21
     """
-    nu = func_nu(M, k, PS, cosmo_dic, Omega_0) 
+    nu = func_nu(M, k, PS, Omega_0)
+    
+    # Implementing 2111.01199 Eq. (30) for mixed dark matter
+    if 'alpha_1' in cosmo_dic and 'alpha_2' in cosmo_dic:
+        alpha_1 = cosmo_dic['alpha_1']
+        alpha_2 = cosmo_dic['alpha_2']
+        f_ax = cosmo_dic['omega_ax_0'] / (cosmo_dic['omega_ax_0']+cosmo_dic['omega_d_0'])
+        M0 = 1.6e10 * (cosmo_dic['m_ax']/1e-22)**(-4/3) * cosmo_dic['h'] # to convert to Msun/h
+        factor = 1 - f_ax + f_ax*(1+(M/M0)**(-alpha_1))**(-alpha_2/alpha_1)
+    else:
+        factor = 1
+    
     return 1./2. * func_rho_comp_0(Omega_0) / M**2 * func_sheth_tormen(nu) \
-           * np.abs(func_dlnsigma2_dlnM(M, k, PS, cosmo_dic, Omega_0))
+           * np.abs(func_dlnsigma2_dlnM(M, k, PS, cosmo_dic, Omega_0)) * factor

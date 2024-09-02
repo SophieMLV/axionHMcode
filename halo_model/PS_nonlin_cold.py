@@ -15,7 +15,7 @@ from .halo_mass_function import *
 
 
 def func_non_lin_PS_matter(M, k, PS, cosmo_dic, hmcode_dic, Omega_0, 
-                           alpha = False, eta_given = False, ax_one_halo=False, one_halo_damping = False, two_halo_damping = False):    
+                           alpha = False, eta_given = False, ax_one_halo=False, one_halo_damping = False, two_halo_damping = False, axion_dic=None):
     """ 
     The cold halo model se master thesis eq. 4.9 with (if set to True) the modifications of HMcode2020 https://arxiv.org/abs/2009.01858
     Since we work with axions, I indroduce the possibility to tread the axions as the HMcode2020 treates the neutrinos
@@ -26,7 +26,7 @@ def func_non_lin_PS_matter(M, k, PS, cosmo_dic, hmcode_dic, Omega_0,
     returns non-lin power spectrum of matter or cold matter in (Mpc/h)^3 at k
     as well as th one halo and two halo term
     """     
-    dens_profile_arr = func_dens_profile_kspace(M, k, PS, cosmo_dic, hmcode_dic, Omega_0, eta_given = eta_given)
+    dens_profile_arr = func_dens_profile_kspace(M, k, PS, cosmo_dic, hmcode_dic, Omega_0, eta_given = eta_given, axion_dic=axion_dic)
     halo_mass_func_arr = func_halo_mass_function(M, k, PS, cosmo_dic, Omega_0)
     
     integrand_arr_one = M[:, None]**2 * halo_mass_func_arr[:, None] * dens_profile_arr**2 
@@ -49,7 +49,7 @@ def func_non_lin_PS_matter(M, k, PS, cosmo_dic, hmcode_dic, Omega_0,
         integrand_arr_two = M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None] * dens_profile_arr
         
         #summand to take care of nummericals issues of the integral, see appendix A in https://arxiv.org/abs/2005.00009
-        summand2 = func_dens_profile_kspace(np.min(M), k, PS, cosmo_dic, hmcode_dic, Omega_0, eta_given = eta_given) \
+        summand2 = func_dens_profile_kspace(np.min(M), k, PS, cosmo_dic, hmcode_dic, Omega_0, eta_given = eta_given, axion_dic=axion_dic) \
                                * ( 1 - integrate.simps(M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None], x = M, axis = 0) / func_rho_comp_0(Omega_0)) 
         factor2 = integrate.simps(integrand_arr_two, x = M, axis = 0) / func_rho_comp_0(Omega_0) + summand2 
         
@@ -58,7 +58,7 @@ def func_non_lin_PS_matter(M, k, PS, cosmo_dic, hmcode_dic, Omega_0,
         halo_bias_arr = func_halo_bias(M, k, PS, cosmo_dic, Omega_0)
         integrand_arr_two = M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None] * dens_profile_arr
         #summand2 take care of nummericals issues of the integral, see appendix A in https://arxiv.org/abs/2005.00009
-        summand2 = func_dens_profile_kspace(np.min(M), k, PS, cosmo_dic, hmcode_dic, Omega_0, eta_given = eta_given) \
+        summand2 = func_dens_profile_kspace(np.min(M), k, PS, cosmo_dic, hmcode_dic, Omega_0, eta_given = eta_given, axion_dic=axion_dic) \
                                * ( 1 - integrate.simps(M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None], x = M, axis = 0) / func_rho_comp_0(Omega_0)) 
         factor2 = integrate.simps(integrand_arr_two, x = M, axis = 0) / func_rho_comp_0(Omega_0) + summand2 
         
