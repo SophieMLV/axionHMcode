@@ -68,7 +68,7 @@ def func_PS_interpolate_M(M, k, PS, cosmo_dic, Omega_0):
     """
     #k_max is chosen such that it is 100 times larger than the k that 
     #coresponds to the smallest mass: k = 2*\pi/R(M) 
-    k_max = 100*2 * np.pi / func_R_M(np.min(M), cosmo_dic, Omega_0)
+    k_max = 100*2 * np.pi / func_R_M(np.min(M), Omega_0)
 
     if k_max < np.max(k):
         return k, PS

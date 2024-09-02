@@ -23,6 +23,10 @@ The total computation time is around 4 minutes. The time is much longer than e.g
 
 The axionHMcode can also use some parameters from the 'HMcode' in [Mead et al.](https://arxiv.org/abs/2009.01858) which improve the predictions in the case of a LCDM cosmology with massive neutrinos. The parameters can switch on by setting the corresponding parameters to True or False in the function for the non-linear power spectrum. The parameters are the smoothing parameters, alpha, the halo bloating term, eta_given, the one halo damping on large scales, one_halo_damping and the two halo damping on large scales, two_halo_damping. By default, only the one halo damping is switched on, because on large scales the non-linear power spectrum should be equal to the linear which is given by the two halo term and thus the one halo term has to be damped on large scales (see [Mead et al.](https://arxiv.org/abs/2009.01858) for details).  
 
+
+## Added Features
+The updated version of axionHMCode is based Numba for increased speed. It also includes optional parameters alpha_1, alpha_2, gamma_1, gamma_2 defined in arXiv:2111.01199 Eq. (36). To use them, just include them in your dictionary of cosmological parameters (the "cosmo_dic" file) before running the "params" and "power spectra" calculation using e.g. cosmo_dic['alpha_1'] = X. They are not yet inculded in the input file.
+
 ## Contact data
 
 If you find any bugs or have any questions with respect to the code, please send me a message via github or open an issue.
