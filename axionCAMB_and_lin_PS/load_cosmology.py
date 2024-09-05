@@ -5,70 +5,10 @@ Load the input file into a dictionary used for the halo model and axionCAMB spec
 import numpy as np
 from scipy import integrate
 
-# def load_cosmology_input(params_path):
-#     """
-#     create a dictionary with all important cosmology parameter
-#     the input file is given in params_path and each parameter
-#     musst be given in a new line
-#     """
-#     cosmo_dic = {}
-#     # default values
-#     cosmo_dic['M_min'] = 1e8
-#     cosmo_dic['M_max'] = 1e17
-#     cosmo_dic['transfer_kmax'] = 1e3
-#     file = open(params_path)
-#     for line in file:
-#         line = line.split('=')
-#         if line[0] == '\n':
-#             continue
-#         elif line[0].strip() == 'omega_b_0' or line[0].strip() == 'Omega_b_0': 
-#             if line[0].strip() == 'omega_b_0':
-#                 cosmo_dic['omega_b_0'] = eval(line[1].strip())
-#             else:
-#                 cosmo_dic['Omega_b_0'] = eval(line[1].strip())
-#         elif line[0].strip() == 'omega_d_0' or line[0].strip() == 'Omega_d_0': 
-#             if line[0].strip() == 'omega_d_0':
-#                 total_dark = eval(line[1].strip()) # when reduced density param is given: Omega_i*h^2
-#             else:
-#                 Total_Dark = eval(line[1].strip()) # when denisty parame Omega is given
-            
-#         elif line[0].strip() == 'ax_fraction':
-#             cosmo_dic['omega_ax_0'] = total_dark * eval(line[1].strip())
-#             cosmo_dic['omega_d_0'] = total_dark - cosmo_dic['omega_ax_0']
-#             cosmo_dic['omega_db_0'] = cosmo_dic['omega_d_0'] + cosmo_dic['omega_b_0']
-#             cosmo_dic['omega_m_0'] = cosmo_dic['omega_db_0'] + cosmo_dic['omega_ax_0']
-#         elif line[0].strip() == 'm_ax':
-#             cosmo_dic['m_ax'] = eval(line[1].strip())
-#         elif line[0].strip() == 'h':
-#             cosmo_dic['h'] = eval(line[1].strip())
-#             cosmo_dic['Omega_b_0'] = cosmo_dic['omega_b_0']/cosmo_dic['h']**2
-#             cosmo_dic['Omega_d_0'] = cosmo_dic['omega_d_0']/cosmo_dic['h']**2
-#             cosmo_dic['Omega_ax_0'] = cosmo_dic['omega_ax_0']/cosmo_dic['h']**2
-#             cosmo_dic['Omega_db_0'] = cosmo_dic['omega_db_0']/cosmo_dic['h']**2
-#             cosmo_dic['Omega_m_0'] = cosmo_dic['Omega_db_0'] + cosmo_dic['Omega_ax_0']
-#             cosmo_dic['Omega_w_0'] = 1 - cosmo_dic['Omega_m_0']
-#         elif line[0].strip() == 'z':
-#             cosmo_dic['z'] = eval(line[1].strip())   
-#         elif line[0].strip() == 'ns':
-#             cosmo_dic['ns'] = eval(line[1].strip())
-#         elif line[0].strip() == 'As':
-#             cosmo_dic['As'] = eval(line[1].strip())  
-#         elif line[0].strip() == 'k_piv':
-#             cosmo_dic['k_piv'] = eval(line[1].strip())
-
-#         elif line[0].strip() == 'transfer_kmax':
-#             cosmo_dic['transfer_kmax'] = eval(line[1].strip()) 
-#         elif line[0].strip() == 'M_min':
-#             cosmo_dic['M_min'] = eval(line[1].strip())
-#         elif line[0].strip() == 'M_max':
-#             cosmo_dic['M_max'] = eval(line[1].strip()) 
-#         elif line[0].split()[0] == '#':
-#             continue   
-#     file.close()
-#     return cosmo_dic
+from cosmology.overdensities import *
 
 
-def load_cosmology_input(params_path):
+def load_cosmology_input(params_path, LCDM = False):
     """
     create a dictionary with all important cosmology parameter
     the input file is given in params_path and each parameter
@@ -142,48 +82,72 @@ def load_cosmology_input(params_path):
         cosmo_dic['omega_m_0'] = cosmo_dic['Omega_m_0'] * cosmo_dic['h']**2
         cosmo_dic['omega_b_0'] = cosmo_dic['Omega_b_0'] * cosmo_dic['h']**2
         Total_dark = cosmo_dic['Omega_m_0'] - cosmo_dic['Omega_b_0']
-        cosmo_dic['omega_ax_0'] = Total_dark * ax_fraction
-        cosmo_dic['Omega_ax_0'] = cosmo_dic['omega_ax_0'] / cosmo_dic['h']**2
-        cosmo_dic['omega_d_0'] = total_dark - cosmo_dic['omega_ax_0']
-        cosmo_dic['Omega_d_0'] = cosmo_dic['omega_d_0'] / cosmo_dic['h']**2
+        if LCDM == True:
+            cosmo_dic['Omega_ax_0'] = 1e-20
+            cosmo_dic['Omega_d_0'] = Total_dark
+        else:
+            cosmo_dic['Omega_ax_0'] = Total_dark * ax_fraction
+            cosmo_dic['Omega_d_0'] = Total_dark - cosmo_dic['Omega_ax_0']
+        
+        
+        cosmo_dic['omega_ax_0'] = cosmo_dic['Omega_ax_0'] * cosmo_dic['h']**2
+        cosmo_dic['omega_d_0'] = cosmo_dic['Omega_d_0'] * cosmo_dic['h']**2
+
         cosmo_dic['omega_db_0'] = cosmo_dic['omega_d_0'] + cosmo_dic['omega_b_0']
         cosmo_dic['Omega_db_0'] = cosmo_dic['omega_db_0'] / cosmo_dic['h']**2
+
+    # when reduced total matter omega_m and reduced baryons omega_b are given, calculate the rest
     elif 'omega_m_0' in cosmo_dic and 'omega_b_0' in cosmo_dic:
         cosmo_dic['Omega_m_0'] = cosmo_dic['omega_m_0'] / cosmo_dic['h']**2
         cosmo_dic['Omega_b_0'] = cosmo_dic['omega_b_0'] / cosmo_dic['h']**2
-        total_dark = cosmo_dic['Omega_m_0'] - cosmo_dic['Omega_b_0']
-        cosmo_dic['omega_ax_0'] = total_dark * ax_fraction
+        total_dark = cosmo_dic['omega_m_0'] - cosmo_dic['omega_b_0']
+
+        if LCDM == True:
+            cosmo_dic['omega_ax_0'] = 1e-20
+            cosmo_dic['omega_d_0'] = total_dark
+        else:
+            cosmo_dic['omega_ax_0'] = total_dark * ax_fraction
+            cosmo_dic['omega_d_0'] = total_dark - cosmo_dic['omega_ax_0']
+
         cosmo_dic['Omega_ax_0'] = cosmo_dic['omega_ax_0'] / cosmo_dic['h']**2
-        cosmo_dic['omega_d_0'] = total_dark - cosmo_dic['omega_ax_0']
         cosmo_dic['Omega_d_0'] = cosmo_dic['omega_d_0'] / cosmo_dic['h']**2
+
         cosmo_dic['omega_db_0'] = cosmo_dic['omega_d_0'] + cosmo_dic['omega_b_0']
         cosmo_dic['Omega_db_0'] = cosmo_dic['omega_db_0'] / cosmo_dic['h']**2
 
-     # when total matter Omega_m and total dark matter Omega_d (contains CDM AND axions!) are given, calculate the rest
-    if 'Omega_m_0' in cosmo_dic  and Total_dark is not None:
+     # when total matter Omega_m and total dark matter Total_dark (contains CDM AND axions!) are given, calculate the rest
+    elif 'Omega_m_0' in cosmo_dic  and Total_dark is not None:
         cosmo_dic['omega_m_0'] = cosmo_dic['Omega_m_0'] * cosmo_dic['h']**2
-        cosmo_dic['omega_d_0'] = cosmo_dic['Omega_d_0'] * cosmo_dic['h']**2
+
+        if LCDM == True:
+            cosmo_dic['Omega_ax_0'] = 1e-20
+            cosmo_dic['Omega_d_0'] = Total_dark
+        else:
+            cosmo_dic['Omega_ax_0'] = Total_dark * ax_fraction
+            cosmo_dic['Omega_d_0'] = Total_dark - cosmo_dic['Omega_ax_0']
 
         
-        cosmo_dic['Omega_ax_0'] = Total_dark * ax_fraction
         cosmo_dic['omega_ax_0'] = cosmo_dic['Omega_ax_0'] * cosmo_dic['h']**2
-
-
-        cosmo_dic['Omega_d_0'] = Total_dark - cosmo_dic['Omega_ax_0']
         cosmo_dic['omega_d_0'] = cosmo_dic['Omega_d_0'] * cosmo_dic['h']**2
 
         cosmo_dic['Omega_b_0'] = cosmo_dic['Omega_m_0'] - Total_dark 
         cosmo_dic['omega_b_0'] = cosmo_dic['Omega_b_0'] * cosmo_dic['h']**2
         cosmo_dic['omega_db_0'] = cosmo_dic['omega_d_0'] + cosmo_dic['omega_b_0']
         cosmo_dic['Omega_db_0'] = cosmo_dic['omega_db_0'] / cosmo_dic['h']**2
+
+    # when reduced total matter omega_m and total dark matter total_dark (contains CDM AND axions!) are given, calculate the rest    
     elif 'omega_m_0' in cosmo_dic and total_dark is not None:
         cosmo_dic['Omega_m_0'] = cosmo_dic['omega_m_0'] / cosmo_dic['h']**2
         
-        cosmo_dic['omega_ax_0'] = total_dark * ax_fraction
+        if LCDM == True:
+            cosmo_dic['omega_ax_0'] = 1e-20
+            cosmo_dic['omega_d_0'] = total_dark
+        else:
+            cosmo_dic['omega_ax_0'] = total_dark * ax_fraction
+            cosmo_dic['omega_d_0'] = total_dark - cosmo_dic['omega_ax_0']
+
+
         cosmo_dic['Omega_ax_0'] = cosmo_dic['omega_ax_0'] / cosmo_dic['h']**2
-
-
-        cosmo_dic['omega_d_0'] = total_dark - cosmo_dic['omega_ax_0']
         cosmo_dic['Omega_d_0'] = cosmo_dic['omega_d_0'] / cosmo_dic['h']**2
 
         cosmo_dic['omega_b_0'] = cosmo_dic['Omega_m_0'] - total_dark 
@@ -193,88 +157,50 @@ def load_cosmology_input(params_path):
 
 
     # when total dark Omega_d (contains CDM AND axions!) and baryon Omega_b are given, calculate the rest
-    if 'Omega_b_0' in cosmo_dic and Total_dark is not None:
+    elif 'Omega_b_0' in cosmo_dic and Total_dark is not None:
         cosmo_dic['omega_b_0'] = cosmo_dic['Omega_b_0'] * cosmo_dic['h']**2
         
-        cosmo_dic['Omega_ax_0'] = Total_dark * ax_fraction
+
+        if LCDM == True:
+            cosmo_dic['Omega_ax_0'] = 1e-20
+            cosmo_dic['Omega_d_0'] = Total_dark
+        else:
+            cosmo_dic['Omega_ax_0'] = Total_dark * ax_fraction
+            cosmo_dic['Omega_d_0'] = Total_dark - cosmo_dic['Omega_ax_0']
+
+
+        cosmo_dic['omega_d_0'] = cosmo_dic['Omega_d_0'] * cosmo_dic['h']**2
         cosmo_dic['omega_ax_0'] = cosmo_dic['Omega_ax_0'] * cosmo_dic['h']**2
 
-        cosmo_dic['Omega_d_0'] = Total_dark - cosmo_dic['Omega_ax_0']
-        cosmo_dic['omega_d_0'] = cosmo_dic['Omega_d_0'] * cosmo_dic['h']**2
-
-        cosmo_dic['Omega_m_0'] = cosmo_dic['Omega_b_0'] + total_dark 
+        cosmo_dic['Omega_m_0'] = cosmo_dic['Omega_b_0'] + Total_dark 
         cosmo_dic['omega_m_0'] = cosmo_dic['Omega_m_0'] * cosmo_dic['h']**2
-
         cosmo_dic['omega_db_0'] = cosmo_dic['omega_d_0'] + cosmo_dic['omega_b_0']
         cosmo_dic['Omega_db_0'] = cosmo_dic['omega_db_0'] / cosmo_dic['h']**2
 
+    # when reduced total dark Omega_d (contains CDM AND axions!) and baryon reduced omega_b are given, calculate the rest
     elif 'omega_b_0' in cosmo_dic and total_dark is not None:
         cosmo_dic['Omega_b_0'] = cosmo_dic['omega_b_0'] / cosmo_dic['h']**2
-        
-        cosmo_dic['omega_ax_0'] = total_dark * ax_fraction
-        cosmo_dic['Omega_ax_0'] = cosmo_dic['omega_ax_0'] / cosmo_dic['h']**2
 
-        cosmo_dic['omega_d_0'] = total_dark - cosmo_dic['omega_ax_0']
+
+        if LCDM == True:
+            cosmo_dic['omega_ax_0'] = 1e-20
+            cosmo_dic['omega_d_0'] = total_dark
+        else:
+            cosmo_dic['omega_ax_0'] = total_dark * ax_fraction
+            cosmo_dic['omega_d_0'] = total_dark - cosmo_dic['omega_ax_0']
+
+
+
+        cosmo_dic['Omega_ax_0'] = cosmo_dic['omega_ax_0'] / cosmo_dic['h']**2
         cosmo_dic['Omega_d_0'] = cosmo_dic['omega_d_0'] / cosmo_dic['h']**2
 
         cosmo_dic['omega_m_0'] = cosmo_dic['omega_b_0'] + total_dark 
         cosmo_dic['Omega_m_0'] = cosmo_dic['omega_m_0'] / cosmo_dic['h']**2
-
         cosmo_dic['omega_db_0'] = cosmo_dic['omega_d_0'] + cosmo_dic['omega_b_0']
         cosmo_dic['Omega_db_0'] = cosmo_dic['omega_db_0'] / cosmo_dic['h']**2
 
     cosmo_dic['Omega_w_0'] = 1 - cosmo_dic['Omega_m_0']
+    cosmo_dic['G_a'] = func_D_z_unnorm_int(cosmo_dic['z'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'])
 
     
-    return cosmo_dic
-
-
-
-
-def load_LCDM_cosmology_input(params_path):
-    """
-    load the coresponding LCDM cosmology as in load_cosmology_inputs
-    from the same input file in params_path
-    by ignoring the axion fraction and hardcode omega_ax_0 = 1e-20.
-    This is because axionCAMB needs omega_ax_0 > 0
-    """
-    cosmo_dic = {}
-    file = open(params_path)
-    for line in file:
-        line = line.split('=')
-        if line[0] == '\n':
-            continue
-        elif line[0].strip() == 'omega_b_0': 
-            cosmo_dic['omega_b_0'] = eval(line[1].strip())
-        elif line[0].strip() == 'omega_d_0':
-            cosmo_dic['omega_d_0'] = eval(line[1].strip())
-            cosmo_dic['omega_ax_0'] = 1e-20 #not equal to zero because axionCAMB needs omega_ax_0>0
-            cosmo_dic['omega_db_0'] = cosmo_dic['omega_d_0'] + cosmo_dic['omega_b_0']
-            cosmo_dic['omega_m_0'] = cosmo_dic['omega_db_0']
-        elif line[0].strip() == 'm_ax':
-            cosmo_dic['m_ax'] = eval(line[1].strip())
-        elif line[0].strip() == 'h':
-            cosmo_dic['h'] = eval(line[1].strip())
-            cosmo_dic['Omega_b_0'] = cosmo_dic['omega_b_0']/cosmo_dic['h']**2
-            cosmo_dic['Omega_d_0'] = cosmo_dic['omega_d_0']/cosmo_dic['h']**2
-            cosmo_dic['Omega_db_0'] = cosmo_dic['omega_db_0']/cosmo_dic['h']**2
-            cosmo_dic['Omega_m_0'] = cosmo_dic['Omega_db_0'] 
-            cosmo_dic['Omega_w_0'] = 1 - cosmo_dic['Omega_m_0']
-        elif line[0].strip() == 'z':
-            cosmo_dic['z'] = eval(line[1].strip())   
-        elif line[0].strip() == 'M_min':
-            cosmo_dic['M_min'] = eval(line[1].strip())
-        elif line[0].strip() == 'M_max':
-            cosmo_dic['M_max'] = eval(line[1].strip())
-        elif line[0].strip() == 'ns':
-            cosmo_dic['ns'] = eval(line[1].strip())
-        elif line[0].strip() == 'As':
-            cosmo_dic['As'] = eval(line[1].strip())  
-        elif line[0].strip() == 'k_piv':
-            cosmo_dic['k_piv'] = eval(line[1].strip())
-        elif line[0].strip() == 'transfer_kmax':
-            cosmo_dic['transfer_kmax'] = eval(line[1].strip())  
-        elif line[0].split()[0] == '#':
-            continue   
-    file.close()
     return cosmo_dic
