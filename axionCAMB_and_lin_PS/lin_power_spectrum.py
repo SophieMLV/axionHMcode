@@ -73,23 +73,7 @@ def func_power_spec_dic(file_path, cosmo_dic):
                                              cosmo_dic['Omega_d_0']*transfer_dic['transfer_CDM'])/cosmo_dic['Omega_db_0'], 
                                              cosmo_dic)
     power_spec_dic['power_axion'] = transfer_to_PS(transfer_dic['k'], transfer_dic['transfer_axion'], cosmo_dic)
+
+
     return power_spec_dic
 
-def func_power_spec_interp_dic(power_spec_dic, cosmo_dic):
-    """
-    crate a dictionary with the linear power spectra from func_power_spec_dic
-    on a larger k range. These PSs are needed to compute the variance correctly.
-    The k range depends on the smallest halo mass given in cosmo_dic
-    The units for k is h/Mpc and for the PSs (Mpc/h)^3.
-    The following linear power spectra will be computed:
-    total, CDM, baryon, cold matter, axion
-    """ 
-    #create PS dictionary
-    power_spec_interp_dic = {}
-    power_spec_interp_dic['k'], _ = func_PS_interpolate_M(cosmo_dic['M_min'], power_spec_dic['k'], power_spec_dic['cold'], cosmo_dic, cosmo_dic['Omega_db_0'])
-    power_spec_interp_dic['power_total'] = func_PS_interpolate(power_spec_interp_dic['k'], power_spec_dic['k'], power_spec_dic['power_total'])
-    power_spec_interp_dic['power_CDM'] = func_PS_interpolate(power_spec_interp_dic['k'], power_spec_dic['k'], power_spec_dic['power_CDM'])
-    power_spec_interp_dic['power_baryon'] = func_PS_interpolate(power_spec_interp_dic['k'], power_spec_dic['k'], power_spec_dic['power_baryon'])  
-    power_spec_interp_dic['cold'] = func_PS_interpolate(power_spec_interp_dic['k'], power_spec_dic['k'], power_spec_dic['cold'])    
-    power_spec_interp_dic['power_axion'] = func_PS_interpolate(power_spec_interp_dic['k'], power_spec_dic['k'], power_spec_dic['power_axion'])
-    return power_spec_interp_dic
