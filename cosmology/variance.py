@@ -58,7 +58,7 @@ def func_sigma_squared_damping_twohalo(k, PS_cold):
     """   
     integrand = PS_cold
     #sigma_squared = integrate.simps(y=integrand, x=k, axis=-1) / (2. * np.pi ** 2)
-    sigma_squared = np.trapz(integrand, x=k_sigma, axis=-1) / (2. * np.pi ** 2) 
+    sigma_squared = np.trapz(integrand, x=k, axis=-1) / (2. * np.pi ** 2) 
     
     return 1/3 * sigma_squared
   
@@ -73,12 +73,12 @@ def func_sigma_M(M, k, PS, Omega_0):
     return func_sigma_r(R, k, PS)
 
 @njit
-def func_nu(M, k, PS_cold, Omega_0_sigma):
+def func_nu(M, k, PS_cold, Omega_0_sigma, Omega_m_0, Omega_w_0, z, G_a):
     """
     k is in units of h/Mpc, PS_cold in (Mpc/h)^3 and M in solar_mass/h,
     NOTE: Omega_0 must match with chosen PS_cold
     """
-    delta_c = func_delta_c()
+    delta_c = func_delta_c(z, Omega_m_0, Omega_w_0, G_a)
     return delta_c/func_sigma_M(M, k, PS_cold, Omega_0_sigma)
 
 @njit

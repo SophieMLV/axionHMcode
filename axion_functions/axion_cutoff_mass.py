@@ -36,7 +36,8 @@ def func_jeans_virial_ratio(M, cosmo_dic, power_spec_dic, axion_dic=None):
     returns the ratio between the halo jeans scale and the virial radius
     """
     halo_jeans_scale = np.pi / func_halo_jeans_kscale(M, cosmo_dic, power_spec_dic, axion_dic=axion_dic) # in Mpc/h
-    virial_radius = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0']) # in Mpc/h
+    virial_radius = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], 
+                               cosmo_dic['Omega_w_0'], cosmo_dic['G_a']) # in Mpc/h
     
     return halo_jeans_scale/virial_radius
 
@@ -50,8 +51,8 @@ def func_cut_mass_axion_halo(cosmo_dic, power_spec_dic, axion_dic=None):
     returns minimal mass where axions are put intto halos in solar_mass/h
     """
     def func_find_root(m):
-        return func_jeans_virial_ratio(m, cosmo_dic, power_spec_dic, axion_dic=axion_dic) -1
+        return func_jeans_virial_ratio(10**(m), cosmo_dic, power_spec_dic, axion_dic=axion_dic) -1
     
-    Mass_min = optimize.brentq(func_find_root, 1e1, 1e18)
-    return Mass_min
+    Mass_min = optimize.brentq(func_find_root, 7, 17)
+    return 10**(Mass_min)
 

@@ -51,7 +51,10 @@ def func_halo_mass_function(M, k, PS, cosmo_dic, Omega_0):
     returns halo mass functions in untits h^4/(M_sun Mpc^3)
     with teh definition as in my  masterthesis eq. 4.21
     """
-    nu = func_nu(M, k, PS, Omega_0)
+    z = cosmo_dic['z']
+    Omega_m_0 = cosmo_dic['Omega_m_0']
+    Omega_w_0 = cosmo_dic['Omega_w_0']
+    nu = func_nu(M, k, PS, Omega_0, Omega_m_0, Omega_w_0, z, cosmo_dic['G_a'])
     
     # Implementing 2111.01199 Eq. (30) for mixed dark matter
     if 'alpha_1' in cosmo_dic and 'alpha_2' in cosmo_dic:

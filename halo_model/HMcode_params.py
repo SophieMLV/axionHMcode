@@ -7,6 +7,7 @@ from scipy import interpolate, misc
 #own pachages
 from cosmology.variance import *
 from cosmology.overdensities import *
+from halo_model.halo_mass_function import *
 
 def func_k_d(k, PS_cold):
     """
@@ -54,15 +55,17 @@ def func_R_nonlin_2(cosmo_dic, k, PS):
     returns the nonlinear scale in Mpc/h defined by
     1 = sigma(R_nonlin)
     """
-    delta_c = func_delta_c()
-    def find_root(R):
-        return func_sigma_r(R, k, PS) - delta_c
+    delta_c = func_delta_c(cosmo_dic['z'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
+    def find_root(lnR):
+        # return func_sigma_r(np.exp(lnR), k, PS) - delta_c
+        return np.log(func_sigma_r(np.exp(lnR), k, PS) / delta_c)
     
-    if find_root(1e-10) * find_root(10.) >= 0.:
+    if find_root(-10) * find_root(1.) >= 0.:
         return -1 # if equation as no soln, return -1
     else:
-        R_nonlin = optimize.brentq(find_root, 1e-10, 10.)
-        return R_nonlin
+        R_nonlin = optimize.brentq(find_root, -10, 1.)
+        # print(func_sigma_r(np.exp(R_nonlin), k, PS) - delta_c)
+        return np.exp(R_nonlin)
 
     
 def func_alpha_param(cosmo_dic, k, PS_cold, LCDM=True):
@@ -77,11 +80,17 @@ def func_alpha_param(cosmo_dic, k, PS_cold, LCDM=True):
     if R_nonlin <= R[0]:
         neff = -3
     else:
-        ln_R = np.log(R)
-        ln_sigma_squared = np.log(func_sigma_r(R, k, PS_cold)**2)
-        func_lnsigma_lnR = interpolate.interp1d(ln_R, ln_sigma_squared, kind = 'cubic', bounds_error=False, fill_value=0.)
-        lnsigma_lnR = misc.derivative(func_lnsigma_lnR, np.log(R_nonlin))
-        neff = -3 - lnsigma_lnR
+        # ln_R = np.log(R)
+        # ln_sigma_squared = np.log(func_sigma_r(R, k, PS_cold)**2)
+        # func_lnsigma_lnR = interpolate.interp1d(ln_R, ln_sigma_squared, kind = 'cubic', bounds_error=False, fill_value=0.)
+        # lnsigma_lnR = misc.derivative(func_lnsigma_lnR, np.log(R_nonlin))
+
+        M_nonlin = (4 * np.pi * R_nonlin**3 * func_rho_comp_0(cosmo_dic['Omega_db_0']))/ 3
+        dlnsigma2_dlnR = 3* func_dlnsigma2_dlnM(M_nonlin, k, PS_cold, cosmo_dic, cosmo_dic['Omega_db_0'])
+
+        # neff = -3 - lnsigma_lnR
+        neff = -3 - dlnsigma2_dlnR
+        # print(neff, R_nonlin)
     
     return 1.875 * 1.603**neff
 

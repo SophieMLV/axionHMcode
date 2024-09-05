@@ -45,7 +45,7 @@ def func_non_lin_PS_matter(M, k, PS, cosmo_dic, hmcode_dic, Omega_0,
     #two halo damping and some extra factors in the two halo term to take care of nummerical issues.
     # see appendix A in https://arxiv.org/abs/2005.00009
     if two_halo_damping == True:
-        halo_bias_arr = func_halo_bias(M, k, PS, cosmo_dic, Omega_0)
+        halo_bias_arr = func_halo_bias(M, k, PS, Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['z'], cosmo_dic['G_a'])
         integrand_arr_two = M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None] * dens_profile_arr
         
         #summand to take care of nummericals issues of the integral, see appendix A in https://arxiv.org/abs/2005.00009
@@ -53,25 +53,23 @@ def func_non_lin_PS_matter(M, k, PS, cosmo_dic, hmcode_dic, Omega_0,
                                * ( 1 - integrate.simps(M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None], x = M, axis = 0) / func_rho_comp_0(Omega_0)) 
         factor2 = integrate.simps(integrand_arr_two, x = M, axis = 0) / func_rho_comp_0(Omega_0) + summand2 
         
-        two_halo = PS * factor2**2 * (1-hmcode_dic['f'] * (k/hmcode_dic['k_d'])**hmcode_dic['n_d']/(1+(k/hmcode_dic['k_d'])**hmcode_dic['n_d']))
+        two_halo = PS * factor2[0]**2 * (1-hmcode_dic['f'] * (k/hmcode_dic['k_d'])**hmcode_dic['n_d']/(1+(k/hmcode_dic['k_d'])**hmcode_dic['n_d']))
     else:
-        halo_bias_arr = func_halo_bias(M, k, PS, cosmo_dic, Omega_0)
+        halo_bias_arr = func_halo_bias(M, k, PS, Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['z'], cosmo_dic['G_a'])
         integrand_arr_two = M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None] * dens_profile_arr
         #summand2 take care of nummericals issues of the integral, see appendix A in https://arxiv.org/abs/2005.00009
         summand2 = func_dens_profile_kspace(np.min(M), k, PS, cosmo_dic, hmcode_dic, Omega_0, eta_given = eta_given, axion_dic=axion_dic) \
                                * ( 1 - integrate.simps(M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None], x = M, axis = 0) / func_rho_comp_0(Omega_0)) 
         factor2 = integrate.simps(integrand_arr_two, x = M, axis = 0) / func_rho_comp_0(Omega_0) + summand2 
         
-        two_halo = PS * factor2**2
-    
+        two_halo = PS * factor2[0]**2
     #smooth the transition
     if alpha == True:
         alpha_param = hmcode_dic['alpha']   
     else:
         alpha_param = 1
-        
-    
-    return (one_halo**(alpha_param) + two_halo[0][:]**(alpha_param))**(1/alpha_param), one_halo, two_halo[0][:]
+
+    return (one_halo**(alpha_param) + two_halo**(alpha_param))**(1/alpha_param), one_halo, two_halo
 
 
 
