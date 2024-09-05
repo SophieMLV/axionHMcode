@@ -74,7 +74,7 @@ def func_delta_c(z, Omega_m_0, Omega_w_0, G_a):
     alpha_1 = 1
     alpha_2 = 0  
 
-    return 1.686 #* ( 1 + f_1*np.log10(Omega_m_z)**alpha_1 + f_2*np.log10(Omega_m_z)**alpha_2)
+    return 1.686 * ( 1 + f_1*np.log10(Omega_m_z)**alpha_1 + f_2*np.log10(Omega_m_z)**alpha_2)
 
 @njit    
 def func_Delta_vir(z, Omega_m_0, Omega_w_0, G_a):
