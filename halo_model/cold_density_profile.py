@@ -46,7 +46,7 @@ def func_conc_param(M, k, PS, cosmo_dic, Omega_0, axion_dic=None):
     returns the concentration parameter as defined in
     https://arxiv.org/abs/2009.01858 in eq. 20
     """
-    B = 4.#5.196
+    B = 5.196
     if 'gamma_1' in cosmo_dic and 'gamma_2' in cosmo_dic:
         # Implementing 2111.01199 Eq. (33) for mixed dark matter
         #Only apply correction for cold DM halos > M_cut
