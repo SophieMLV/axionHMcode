@@ -53,8 +53,7 @@ def func_delta_c(z, Omega_m_0, Omega_w_0, G_a):
     """
     returns critical denity for spherical/ellepsoidal collapse for LCDM cosmos
     """ 
-    # g_a = func_D_z_unnorm(z, Omega_m_0, Omega_w_0)*(1+z) 
-    # print(g_a)   
+    # g_a = func_D_z_unnorm(z, Omega_m_0, Omega_w_0)*(1+z)
     # return 1.686
     g_a = func_D_z_unnorm(z, Omega_m_0, Omega_w_0)*(1+z)
     p_10 = -0.0069

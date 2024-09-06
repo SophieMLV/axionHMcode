@@ -29,3 +29,4 @@ paramfiles/cosmos_transfer_out.dat
 paramfiles/paramfile_axionCAMB.txt
 solvers/__pycache__/integrators.cpython-39.pyc
 solvers/__pycache__/root_finders.cpython-39.pyc
+.DS_Store

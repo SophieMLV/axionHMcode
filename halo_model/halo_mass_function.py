@@ -20,7 +20,7 @@ def func_sheth_tormen(v, A = 0.3222, p = 0.3, q = 0.707):
 
 def func_term_derivative_sigma2_M(R, k, conditional_return=True):
     """
-    returns integrand for the halo mass function as in my masterthesis eq. 4.24
+    returns integrand for the halo mass function
     """
     x = np.outer(R, k)
     term1 = np.sin(x) * (1.0 - (3.0 / x ** 2)) + 3.0 / x * np.cos(x)
@@ -35,7 +35,7 @@ def func_term_derivative_sigma2_M(R, k, conditional_return=True):
 def func_dlnsigma2_dlnM(M, k, PS, cosmo_dic, Omega_0):
     """
     k units of h/Mpc, M in solar_mass/h and PS in (Mpc/h)^3 
-    returns integral for the halo mass function as in my masterthesis eq. 4.23
+    returns integral for the halo mass function as in eq. 22 in https://arxiv.org/abs/2209.13445
     """
     R = func_R_M(M, Omega_0) #translate M into R 
     sigma = func_sigma_M(M, k, PS, Omega_0)
@@ -49,7 +49,7 @@ def func_halo_mass_function(M, k, PS, cosmo_dic, Omega_0):
     """
     k in h/Mpc, M in solar_mass/h and PS in (Mpc/h)^3 
     returns halo mass functions in untits h^4/(M_sun Mpc^3)
-    with teh definition as in my  masterthesis eq. 4.21
+    with the definition as in eq 20 in https://arxiv.org/abs/2209.13445
     """
     z = cosmo_dic['z']
     Omega_m_0 = cosmo_dic['Omega_m_0']

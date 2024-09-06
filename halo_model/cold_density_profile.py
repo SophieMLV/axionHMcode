@@ -83,7 +83,7 @@ def func_dens_profile_kspace(M, k, PS, cosmo_dic, hmcode_dic, Omega_0, eta_given
     """
     k, k units of h/Mpc, M in solar_mass/h and PS, PS in (Mpc/h)^3 
     NOTE: Omega_0 must match with chosen PS
-    returns Fourier trafo of NFW profile (dimensionless) at k as given in my masterthesis eq. 4.20
+    returns Fourier trafo of NFW profile (dimensionless) at k as given eq 18 in https://arxiv.org/abs/2209.13445
     """
     z = cosmo_dic['z']
     Omega_m_0 = cosmo_dic['Omega_m_0']
@@ -130,7 +130,7 @@ def func_delta_char(M, k, PS, cosmo_dic, hmcode_dic, Omega_0, Omega_0_Sigma, eta
     """
     k units of h/Mpc, M in solar_mass/h and PS in (Mpc/h)^3 
     returns NFW profile in h^2 * M_sun/Mpc^3 at k in h/Mpc
-    as given in my masterthesis eq. 4.15 (left)
+    as given in  eq 17 in https://arxiv.org/abs/2209.13445
     """
     z = cosmo_dic['z']
     Omega_m_0 = cosmo_dic['Omega_m_0']

@@ -42,7 +42,7 @@ def func_rho_soliton(r, M, cosmo_dic, rho_central_param):
     but with core radius as in func_core_radius
     r in Mpc/h, M_vir in solar_mass/h and m_ax in eV
     the rho_central_param scales the central density, this is needed
-    for the complete axion density profile, see my masterthesis eq TBC
+    for the complete axion density profile, see eq. 47 https://arxiv.org/abs/2209.13445
     returns the soliton denity profile in solar_mass/pc^3 * h^2
     """
     m_ax = cosmo_dic['m_ax']
@@ -71,7 +71,6 @@ def func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, M_cut, rho_central
     we get the correct mass of the soliton halo, 
     see func_central_density_param
     the density profile has units solar_mass/Mpc^3 * h^2
-    see masterthesis sec. 5.2.3.
     """
     #distinguish whether M is an array or a scalar
     if isinstance(M, (int, float)) == True:

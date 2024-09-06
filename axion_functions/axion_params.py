@@ -39,7 +39,7 @@ def func_axion_param_dic(M, cosmo_dic, power_spec_dic):
 
     #print('Generated axion dictionary')
 
-    #not all axions cluster. Compute clustered fraction by f = 1/\rho_ax * int_Mcut^\inf n(M)*b(M)*M_ax(M) dM, see masterthesis eq.
+    #not all axions cluster. Compute clustered fraction by f = 1/\rho_ax * int_Mcut^\inf n(M)*b(M)*M_ax(M) dM, see eq. 39 of https://arxiv.org/abs/2209.13445
     k = power_spec_dic['k']
     PS_cold = power_spec_dic['power_cold']
     integrand_arr = func_halo_mass_function(axion_param_dic['M_int'], k, PS_cold , cosmo_dic, cosmo_dic['Omega_db_0']) * \
