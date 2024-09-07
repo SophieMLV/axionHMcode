@@ -7,8 +7,8 @@ import numpy as np
 from scipy import integrate, optimize
 
 #own pachages
-from basic_cosmology import *
-from overdensities import *
+from basic_cosmology import func_R_M
+from overdensities import func_delta_c
 
 
 def spherical_tophat_window_function(R, k, conditional_return=True):

@@ -2,8 +2,7 @@
 Load the input file into a dictionary used for the halo model and axionCAMB specifications
 """
 
-import numpy as np
-from scipy import integrate
+from overdensities import func_D_z_unnorm_int
 
 def load_cosmology_input(params_path):
     """
@@ -22,7 +21,7 @@ def load_cosmology_input(params_path):
         elif line[0].strip() == 'omega_d_0': 
             total_dark = eval(line[1].strip())
         elif line[0].strip() == 'ax_fraction':
-            cosmo_dic['omega_ax_0'] = total_dark * eval(line[1].strip())
+            cosmo_dic['omega_ax_0'] = (total_dark + cosmo_dic['omega_b_0']) * eval(line[1].strip())
             cosmo_dic['omega_d_0'] = total_dark - cosmo_dic['omega_ax_0']
             cosmo_dic['omega_db_0'] = cosmo_dic['omega_d_0'] + cosmo_dic['omega_b_0']
             cosmo_dic['omega_m_0'] = cosmo_dic['omega_db_0'] + cosmo_dic['omega_ax_0']
@@ -42,6 +41,14 @@ def load_cosmology_input(params_path):
             cosmo_dic['M_min'] = eval(line[1].strip())
         elif line[0].strip() == 'M_max':
             cosmo_dic['M_max'] = eval(line[1].strip())
+        elif line[0].strip() == 'alpha_1':
+            cosmo_dic['alpha_1'] = eval(line[1].strip())
+        elif line[0].strip() == 'alpha_2':
+            cosmo_dic['alpha_2'] = eval(line[1].strip())
+        elif line[0].strip() == 'gamma_1':
+            cosmo_dic['gamma_1'] = eval(line[1].strip())
+        elif line[0].strip() == 'gamma_2':
+            cosmo_dic['gamma_2'] = eval(line[1].strip())
         elif line[0].strip() == 'ns':
             cosmo_dic['ns'] = eval(line[1].strip())
         elif line[0].strip() == 'As':
@@ -53,6 +60,7 @@ def load_cosmology_input(params_path):
         elif line[0].split()[0] == '#':
             continue   
     file.close()
+    cosmo_dic['G'] = func_D_z_unnorm_int(cosmo_dic['z'], cosmo_dic)
     return cosmo_dic
 
 def load_LCDM_cosmology_input(params_path):
@@ -83,6 +91,7 @@ def load_LCDM_cosmology_input(params_path):
             cosmo_dic['Omega_d_0'] = cosmo_dic['omega_d_0']/cosmo_dic['h']**2
             cosmo_dic['Omega_db_0'] = cosmo_dic['omega_db_0']/cosmo_dic['h']**2
             cosmo_dic['Omega_m_0'] = cosmo_dic['Omega_db_0'] 
+            cosmo_dic['Omega_ax_0'] = cosmo_dic['omega_ax_0']/cosmo_dic['h']**2
             cosmo_dic['Omega_w_0'] = 1 - cosmo_dic['Omega_m_0']
         elif line[0].strip() == 'z':
             cosmo_dic['z'] = eval(line[1].strip())   
@@ -101,4 +110,5 @@ def load_LCDM_cosmology_input(params_path):
         elif line[0].split()[0] == '#':
             continue   
     file.close()
+    cosmo_dic['G'] = func_D_z_unnorm_int(cosmo_dic['z'], cosmo_dic)
     return cosmo_dic

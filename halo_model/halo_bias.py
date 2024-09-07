@@ -2,11 +2,8 @@
 functions for the halo bias
 """
 
-#packages needed
-import numpy as np
-#own pachages
-from cosmology.overdensities import *
-from cosmology.variance import *
+from cosmology.overdensities import func_delta_c
+from cosmology.variance import func_nu
 
 #halo bias as in my notes
 def func_halo_bias(M, k_sigma, PS_sigma, cosmo_dic, Omega_0, p = 0.3, q = 0.707):

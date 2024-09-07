@@ -2,15 +2,16 @@
 functions for the cold matter halo denity profile
 """
 
-#packages needed
 import numpy as np
 import scipy 
-from scipy import optimize
+from scipy import optimize, interpolate
+from cosmology.basic_cosmology import func_rho_comp_0
+from cosmology.overdensities import func_D_z_norm, func_r_vir, func_Delta_vir
+from cosmology.variance import func_nu
 
-#own pachages
-from cosmology.basic_cosmology import *
-from cosmology.overdensities import *
-from cosmology.variance import *
+# Global cache for the interpolator
+_concentration_interpolator_cache = None
+_zguess_interpolator_cache = None
 
 #find z_formation given by Mead 2020 eq. 21
 def func_z_formation(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, f = 0.01):
@@ -25,28 +26,40 @@ def func_z_formation(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, f = 0.01):
         nu = func_nu(f*Mass, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma)
         return func_D_z_norm(x, cosmo_dic) - D_norm * nu
     if isinstance(M, (int, float)) == True:
-        #test if we find a root, if not by definition formation redshift is set to given z.
+        # Test if we find a root, if not by definition formation redshift is set to given z.
         if func_find_root(z, M)*func_find_root(100., M) > 0.:
             return z
         else:
             z_f = optimize.brentq(func_find_root, z, 100., args = (M))
             return z_f
     else:
-        #test also if we can find a root
+        # Test also if we can find a root
         return np.array([optimize.brentq(func_find_root, z, 100., args=(m)) if func_find_root(z, m)*func_find_root(100., m) < 0 else z for m in M])
 
-
-
-def func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma):
+def func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, recalc_c = False):
     """
     k_sigma is in units of h/Mpc, PS_sigma in (Mpc/h)^3 and M in solar_mass/h
     NOTE: Omega_0 must match with chosen PS_sigma
     returns the concentration parameter as defined in
     https://arxiv.org/abs/2009.01858 in eq. 20
     """
-    B = 4.#5.196
-    return  B * (1 + func_z_formation(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) )/(1+cosmo_dic['z'])
-
+    global _concentration_interpolator_cache # CDM interpolator
+    B = 5.196   
+    concentrations = []    
+    
+    if _concentration_interpolator_cache is None or recalc_c:
+        # First time the function is called, create the interpolator
+        mass_range = np.logspace(7, 18, num=200)
+        for M in mass_range:
+            zf = func_z_formation(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) 
+            c = B*(1+zf)/(1.+cosmo_dic['z']) # Halo concentration; equation (20)
+            concentrations.append(c)
+        # Create an interpolation function
+        _concentration_interpolator_cache = interpolate.interp1d(mass_range, concentrations, kind='linear', fill_value="extrapolate")
+    
+    # Use the cached interpolator
+    c_eval = _concentration_interpolator_cache(M)
+    return c_eval # Defined by r_vir/r_2
 
 #function for the normaliation factor in NFW profile
 def func_for_norm_factor(x):
@@ -55,9 +68,8 @@ def func_for_norm_factor(x):
     """
     return (- x/(1+x)) + np.log(1+x)
 
-
 #density profile in k space (fourietrafo)
-def func_dens_profile_kspace(M, k, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = False):
+def func_dens_profile_kspace(M, k, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = False, recalc_c = False):
     """
     k, k_sigma units of h/Mpc, M in solar_mass/h and PS, PS_sigma in (Mpc/h)^3 
     NOTE: be carefull, we have two k's: k is the k, where the function is evaluated 
@@ -73,10 +85,12 @@ def func_dens_profile_kspace(M, k, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Ome
         eta = np.array([0.]) 
         nu = 1.
     
-    R_vir = func_r_vir(M, cosmo_dic, Omega_0)
-    concentration = func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) / (nu**eta)
-    k_R_vir = np.outer(R_vir, k)
-    a = np.outer(R_vir/concentration, k)
+    R_vir = np.atleast_1d(func_r_vir(M, cosmo_dic, Omega_0))
+    concentration = np.atleast_1d(func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, recalc_c = recalc_c))
+    
+    k_scaled = k * nu[:, None]**eta[:, None]
+    k_R_vir = R_vir[:, None] * k_scaled
+    a = (R_vir[:, None] / concentration[:, None]) * k_scaled
     
     def sin_integral(x):
         return scipy.special.sici(x)[0]
@@ -88,9 +102,7 @@ def func_dens_profile_kspace(M, k, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Ome
     summand3 = - np.sin(k_R_vir) / (a+k_R_vir)
     
     dens_profile_kspace = 1. / func_for_norm_factor(concentration)[:, None] * (summand1 + summand2 + summand3)
-    
-    return dens_profile_kspace
-
+    return dens_profile_kspace 
 
 #delta_char for the NFW profile
 def func_delta_char(M, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = False): 
@@ -128,10 +140,9 @@ def NFW_profile(M, r, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0
         nu = 1.
         
     concentration = func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) / (nu**eta)
-    normalisation = func_delta_char(M, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = eta_given) 
+    normalisation = func_delta_char(M, k_sigma, PS_sigma, cosmo_dic, hmcode_dic, Omega_0, Omega_0_sigma, eta_given = eta_given)
     r_s = func_r_vir(M, cosmo_dic, Omega_0) / concentration
     
     NFW_func = 1 /((r/r_s) * (1+r/r_s)**2)
     
     return normalisation * NFW_func
-
