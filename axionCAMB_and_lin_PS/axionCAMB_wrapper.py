@@ -20,18 +20,18 @@ def axioncamb_params(params_path, arg_dic={}, print_info = True,
                 axion_isocurvature='F', alpha_ax=0, Hinf=13.7,
                 w=-1, use_axfrac='F',
                 omaxh2=0.001, m_ax=1.e-26,
-                cs2_lam=1, temp_cmb=2.726, helium_fraction=0.24,
-                massless_neutrinos=3.046, massive_neutrinos=0,
+                cs2_lam=1, temp_cmb=2.7255, helium_fraction=0.24582560005375895,
+                massless_neutrinos=3.044, massive_neutrinos=0,
                 nu_mass_eigenstates=1, nu_mass_fractions=1, share_delta_neff='T',
                 initial_power_num=1, pivot_scalar=0.05,
-                pivot_tensor=0.05, scalar_amp__1___=2.1e-9,
+                pivot_tensor=0.05, scalar_amp__1___=2.0670630545130352e-09, # scalar_amp__1___ will be recalculated if necessary to match sigma8
                 scalar_spectral_index__1___=0.965, scalar_nrun__1___=0,
                 tensor_spectral_index__1___=0,
                 initial_ratio__1___=0, tens_ratio=0,
-                reionization='T', re_use_optical_depth='T',
+                reionization='T', re_use_optical_depth='F',
                 re_optical_depth=0.06, # to be consistent when combining with CMB surveys
-                re_redshift=11, re_delta_redshift=1.5, re_ionization_frac=-1,
-                RECFAST_fudge=1.14, RECFAST_fudge_He=0.86, RECFAST_Heswitch=6,
+                re_redshift=10, re_delta_redshift=0.5, re_ionization_frac=-1,
+                RECFAST_fudge=1.125, RECFAST_fudge_He=0.86, RECFAST_Heswitch=6,
                 RECFAST_Hswitch='T', initial_condition=1,
                 initial_vector='-1 0 0 0 0', vector_mode=0, COBE_normalize='F',
                 CMB_outputscale=7.4311e12, transfer_high_precision='F',
@@ -56,7 +56,7 @@ def axioncamb_params(params_path, arg_dic={}, print_info = True,
                 feedback_level=1, lensing_method=1, accurate_BB='F', massive_nu_approx=1,
                 accurate_polarization='T', accurate_reionization='T',
                 do_tensor_neutrinos='T', do_late_rad_truncation='T',
-                number_of_threads=0, high_accuracy_default='F',
+                number_of_threads=0, high_accuracy_default='T',
                 accuracy_boost=1, l_accuracy_boost=1, l_sample_boost=1):
     """
     Define a dictionary of all parameters in axionCAMB, set to their default values.
@@ -142,13 +142,11 @@ def run_axioncamb(params_path, camb_exec_dir, arg_dic, print_info = True):
     file_path = cwd + "/" + params_path #file path for axionCAMB
     if print_info == True:
         print("Running CAMB on", file_path)
-    output = subprocess.check_output([camb_exec_dir + "/" + "./camb", file_path]).decode(sys.stdout.encoding) #run axionCAMB
-
+    output = subprocess.run([camb_exec_dir + "/" + "./camb", file_path], capture_output=True, check=False).stdout.decode(sys.stdout.encoding)
+    
     #go through the output to save sigma8 of the PS in the parameter dictionary arg_dic
     for line in output.split("\n"):
         if "sigma8" in line:
                 s8line = line[line.find('sigma8'):]  # Only get sigma8 part of string
-                sigma8 = float(re.findall(r'\b\d+.\d+\b', s8line)[0])
+                sigma8 = float(re.findall(r'\b\d+(?:\.\d+)?(?:[eE][-+]?\d+)?\b', s8line)[0])
                 arg_dic['sigma_8'] = sigma8 # save sigma8 in arg_dic
-
-    
