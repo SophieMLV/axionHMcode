@@ -6,7 +6,7 @@ m_ax = 1e-25 		#axion mass
 h = 0.674			#reduced hubbel: h = H/100
 z = 0.				#redshift
 M_min = 7			#min halo mass for halo model
-M_max = 17			#max halo mass for halo model
+M_max = 18			#max halo mass for halo model
 
 #axionCAMB specifications
 ns = 0.9655			#scalar prectral index
