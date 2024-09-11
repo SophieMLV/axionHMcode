@@ -28,7 +28,7 @@ The 'AxionHMcode' can also use the parameters from the 'HMCode-2020' in [Mead et
 [Dome et al.]() presented an improved version of 'AxionHMcode' by resolving some bugs and introducing new parameters which are calibrated from simulations presented in this paper.
 The changes in the code are the following:
 1. the axion-mass cold mass relation, $'M_a(M_c)'$, is now modeled as a broken power law (see Eq. 51 in [Dome et al.]()) which ensures the old relation of $'M_a(M_c) = \Omega_a/\Omega_c M_c'$ above a defined cut-off mass. This new relation is inspired by the simulations and is calibrated by them. 
-2. The authors introduced new smoothing parameters $'\alpha'$ for the cold-cold power spectrum and the cross-power spectrum which depend on the axion mass and axion density.
+2. The authors introduced new smoothing parameters $'\alpha'$ for the cold-cold power spectrum and the cross-power spectrum which depend on the axion mass and axion density. The exact form of these parameters was calibrated by simulations.
 3. The two halo term is now calculated by the linear power spectrum only. The difference between the total two halo term is minor and the speed up is increased. There is still the option to use the full two halo term by setting the parameter 'full_2h' to 'True'. 
 4. A bug in the cold density profile when using the halo bloating term was corrected.
 5. The relations of the critical density threshold, $'\delta_c'$ and the virial overdensity, $'\Delta_{\mathrm{vir}}'$, are now calculated as in 'HMCode-2020' Eq. A1 and A2. This ensures that 'AxionHMcode' and 'HMCode-2020' agree in the case of a LCDM cosmology.
