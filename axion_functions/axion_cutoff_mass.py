@@ -1,14 +1,10 @@
 """functions for axions and when they cluster, ie evolve non-linear"""
 
 import numpy as np
-from scipy import optimize
-
-from cosmology.basic_cosmology import *
-from cosmology.overdensities import *
-from cosmology.variance import *
-from halo_model.cold_density_profile import *
-
-
+from cosmology.overdensities import func_r_vir
+from halo_model.cold_density_profile import func_conc_param, func_for_norm_factor
+from scipy.interpolate import RegularGridInterpolator
+import warnings
     
 def func_halo_jeans_kscale(M, cosmo_dic, power_spec_dic, axion_dic=None):
     """
@@ -41,7 +37,6 @@ def func_jeans_virial_ratio(M, cosmo_dic, power_spec_dic, axion_dic=None):
     
     return halo_jeans_scale/virial_radius
 
-
 def func_cut_mass_axion_halo(cosmo_dic, power_spec_dic, axion_dic=None):
     """
     axions form a halo if the mass of the host cold matter halo
@@ -54,5 +49,39 @@ def func_cut_mass_axion_halo(cosmo_dic, power_spec_dic, axion_dic=None):
         return func_jeans_virial_ratio(10**(m), cosmo_dic, power_spec_dic, axion_dic=axion_dic) -1
     
     Mass_min = optimize.brentq(func_find_root, 7, 17)
-    return 10**(Mass_min)
 
+def func_beta2(cosmo_dic, power_spec_dic_sigma, axion_dic = None):
+    """
+    returns beta2 parameter in axion mass-cold mass relation Max(Mc) parametrization (steepness of suppression compared to cosmic average Ωa/Ωc Mc)
+    """
+    # Define the data
+    z_values = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0])
+    f_values = np.array([0.01, 0.1, 0.2, 0.3])
+    
+    # Data matrix for β2 values corresponding to each (z, f) pair
+    beta2_matrix = np.array([
+        [1.27, 0.98, 0.61, 0.30],  # z = 1.0
+        [1.22, 0.87, 0.59, 0.32],  # z = 2.0
+        [1.32, 0.93, 0.66, 0.40],  # z = 3.0
+        [1.37, 0.96, 0.71, 0.45],  # z = 4.0
+        [1.43, 1.04, 0.75, 0.51],  # z = 5.0
+        [1.46, 1.02, 0.79, 0.58],  # z = 6.0
+        [1.48, 1.04, 0.77, 0.63],  # z = 7.0
+        [1.52, 1.04, 0.78, 0.62]   # z = 8.0
+    ])
+    
+    # Create an interpolation function
+    ip = RegularGridInterpolator((z_values, f_values), beta2_matrix, bounds_error=False, fill_value=None) # values outside the domain are extrapolated
+
+    # Function to get β2 value for any (z, f)
+    def get_beta2(z, f):
+        if z < z_values.min() or z > z_values.max():
+            warnings.warn("Warning. Redshift z = {:.2f} is not in the range [1.0, 8.0] where beta2 is defined. Extrapolate".format(z))
+        if f < f_values.min() or f > f_values.max():
+            warnings.warn("Warning. Axion fraction f = {:.2f} is not in the range [0.01, 0.3] where beta2 is defined. Extrapolate".format(f))
+        p = [z, f]
+        return ip([p])[0]
+    z = cosmo_dic['z']
+    f = cosmo_dic['omega_ax_0']/cosmo_dic['omega_m_0']
+    beta2 = get_beta2(z, f)
+    return beta2

@@ -2,15 +2,16 @@
 functions for the cold matter halo denity profile
 """
 
-#packages needed
 import numpy as np
 import scipy 
-from scipy import optimize
+from scipy import optimize, interpolate
+from cosmology.basic_cosmology import func_rho_comp_0
+from cosmology.overdensities import func_D_z_norm, func_r_vir, func_Delta_vir
+from cosmology.variance import func_nu
 
-#own pachages
-from cosmology.basic_cosmology import *
-from cosmology.overdensities import *
-from cosmology.variance import *
+# Global cache for the interpolator
+_concentration_interpolator_cache = None
+_zguess_interpolator_cache = None
 
 #find z_formation given by Mead 2020 eq. 21
 def func_z_formation(M, k, PS, cosmo_dic, Omega_0, f = 0.01):
@@ -27,14 +28,14 @@ def func_z_formation(M, k, PS, cosmo_dic, Omega_0, f = 0.01):
         nu = func_nu(f*Mass, k, PS, Omega_0, Omega_m_0, Omega_w_0, z, cosmo_dic['G_a'])
         return func_D_z_norm(x, Omega_m_0, Omega_w_0) - D_norm * nu
     if isinstance(M, (int, float)) == True:
-        #test if we find a root, if not by definition formation redshift is set to given z.
+        # Test if we find a root, if not by definition formation redshift is set to given z.
         if func_find_root(z, M)*func_find_root(100., M) > 0.:
             return z
         else:
             z_f = optimize.brentq(func_find_root, z, 100., args = (M))
             return z_f
     else:
-        #test also if we can find a root
+        # Test also if we can find a root
         return np.array([optimize.brentq(func_find_root, z, 100., args=(m)) if func_find_root(z, m)*func_find_root(100., m) < 0 else z for m in M])
 
 
@@ -76,7 +77,6 @@ def func_for_norm_factor(x):
     normalisation function for the NFW profile
     """
     return (- x/(1+x)) + np.log(1+x)
-
 
 #density profile in k space (fourietrafo)
 def func_dens_profile_kspace(M, k, PS, cosmo_dic, hmcode_dic, Omega_0, eta_given = False, axion_dic=None):
@@ -121,9 +121,7 @@ def func_dens_profile_kspace(M, k, PS, cosmo_dic, hmcode_dic, Omega_0, eta_given
     summand3 = - np.sin(k_R_vir) / (a+k_R_vir)
     
     dens_profile_kspace = 1. / func_for_norm_factor(concentration)[:, None] * (summand1 + summand2 + summand3)
-    
-    return dens_profile_kspace
-
+    return dens_profile_kspace 
 
 #delta_char for the NFW profile
 def func_delta_char(M, k, PS, cosmo_dic, hmcode_dic, Omega_0, Omega_0_Sigma, eta_given = False, axion_dic=None): 
@@ -173,4 +171,3 @@ def NFW_profile(M, r, k, PS, cosmo_dic, hmcode_dic, Omega_0, Omega_0_Sigma, eta_
     NFW_func = 1 /((r/r_s) * (1+r/r_s)**2)
     
     return normalisation * NFW_func
-

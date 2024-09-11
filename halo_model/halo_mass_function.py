@@ -2,20 +2,19 @@
 functions for the halo mass function
 """
 
-#packages needed
 import numpy as np
 from scipy import integrate
+from cosmology.basic_cosmology import func_R_M, func_rho_comp_0
+from cosmology.variance import func_sigma_M, func_nu
 
-#own pachages
-from cosmology.basic_cosmology import *
-from cosmology.variance import *
-
-def func_sheth_tormen(v, A = 0.3222, p = 0.3, q = 0.707):
+def func_sheth_tormen(nu, p = 0.3, q = 0.707):
     """
     returns Sheth-Tormen fit function from 1999. A = 0.3222, p = 0.3 and q = 0.707 by default.
     v := delta_c/sigma(M), thus dimensionless by definition.
     """
-    return A * (2. * q / np.pi) ** 0.5 * v * (1. + (q ** 0.5 * v) ** (-2. * p)) * np.exp((-q * v ** 2.) / 2.)
+    from scipy.special import gamma as Gamma
+    A = np.sqrt(2.*q)/(np.sqrt(np.pi) + Gamma(0.5-p)/2**p)  # A ~ 0.2161
+    return A * nu * (1. + (q ** 0.5 * nu) ** (-2. * p)) * np.exp((-q * nu ** 2.) / 2.)
 
 
 def func_term_derivative_sigma2_M(R, k, conditional_return=True):

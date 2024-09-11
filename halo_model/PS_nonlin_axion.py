@@ -1,16 +1,13 @@
 """functions for my full axion halo model and simpified halo models"""
 
-#packages needed
 import numpy as np
 from scipy import integrate
-#own pachages
-from cosmology.basic_cosmology import *
-from .halo_bias import *
-from .halo_mass_function import *
-from .cold_density_profile import *
-from .axion_density_profile import *
-from .PS_nonlin_cold import *
-
+from cosmology.basic_cosmology import func_rho_comp_0
+from .halo_bias import func_halo_bias
+from .halo_mass_function import func_halo_mass_function
+from .cold_density_profile import func_dens_profile_kspace
+from .axion_density_profile import func_dens_profile_ax_kspace
+from .PS_nonlin_cold import func_non_lin_PS_matter
 
 
 def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic, 
@@ -161,6 +158,3 @@ def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic,
                       + (cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_m_0'])**2 * PS_total_ax
     
     return PS_total_matter, PS_cold_nonlin, PS_total_cross, PS_total_ax
-
-
-

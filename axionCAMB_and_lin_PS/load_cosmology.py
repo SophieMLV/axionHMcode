@@ -5,7 +5,7 @@ Load the input file into a dictionary used for the halo model and axionCAMB spec
 import numpy as np
 from scipy import integrate
 
-from cosmology.overdensities import *
+from cosmology.overdensities import func_D_z_unnorm_int
 
 
 def load_cosmology_input(params_path, LCDM = False):

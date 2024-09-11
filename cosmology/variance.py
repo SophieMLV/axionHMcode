@@ -7,8 +7,8 @@ import numpy as np
 from scipy import integrate, optimize
 
 #own pachages
-from .basic_cosmology import *
-from .overdensities import *
+from .basic_cosmology import func_R_M
+from .overdensities import func_delta_c
 
 from solvers.root_finders import *
 from numba import jit, njit

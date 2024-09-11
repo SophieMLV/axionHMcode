@@ -34,10 +34,10 @@ def axioncamb_params(params_path, arg_dic={}, print_info = True,
                 scalar_nrun__1___=0,
                 tensor_spectral_index__1___=0,
                 initial_ratio__1___=0, tens_ratio=0,
-                reionization='T', re_use_optical_depth='T',
+                reionization='T', re_use_optical_depth='F',
                 re_optical_depth=0.06, # to be consistent when combining with CMB surveys
-                re_redshift=11, re_delta_redshift=1.5, re_ionization_frac=-1,
-                RECFAST_fudge=1.14, RECFAST_fudge_He=0.86, RECFAST_Heswitch=6,
+                re_redshift=10, re_delta_redshift=0.5, re_ionization_frac=-1,
+                RECFAST_fudge=1.125, RECFAST_fudge_He=0.86, RECFAST_Heswitch=6,
                 RECFAST_Hswitch='T', initial_condition=1,
                 initial_vector='-1 0 0 0 0', vector_mode=0, COBE_normalize='F',
                 CMB_outputscale=7.4311e12, transfer_high_precision='T', transfer_k_per_logint=0,
@@ -139,8 +139,8 @@ def run_axioncamb(params_path, camb_exec_dir, arg_dic, print_info = True):
     file_path = cwd + "/" + params_path #file path for axionCAMB
     if print_info == True:
         print("Running CAMB on", file_path)
-    output = subprocess.check_output([camb_exec_dir + "/" + "./camb", file_path]).decode(sys.stdout.encoding) #run axionCAMB
-
+    output = subprocess.run([camb_exec_dir + "/" + "./camb", file_path], capture_output=True, check=False).stdout.decode(sys.stdout.encoding)
+    
     #go through the output to save sigma8 of the PS in the parameter dictionary arg_dic
     if bool(np.array(arg_dic['z']).shape): # check if array (skipped if float)
         arg_dic['sigma_8'] = []

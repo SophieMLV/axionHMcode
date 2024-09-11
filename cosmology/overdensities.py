@@ -2,12 +2,9 @@
 functions for the critical overdensity in spherical/ellipsoidal collaps and halo overdensity
 """
 
-#packages
 import numpy as np
 from scipy import integrate
-
-#own packages
-from .basic_cosmology import *
+from .basic_cosmology import func_E_z, func_Omega_comp_z, func_rho_comp_0
 
 from numba import jit, njit
 from solvers.integrators import *
@@ -64,8 +61,8 @@ def func_delta_c(z, Omega_m_0, Omega_w_0, G_a):
     p_21 = -0.0647
     p_22 = -0.0417
     p_23 = 0.0646
-    f_1 = p_10 + p_11*(1-g_a) + p_12*(1-g_a)**2 + p_13*(1-G_a)
-    f_2 = p_20 + p_21*(1-g_a) + p_22*(1-g_a)**2 + p_23*(1-G_a)
+    f_1 = p_10 + p_11*(1-g_a) + p_12*(1-g_a)**2 + p_13*(1-G_a*(1+z))
+    f_2 = p_20 + p_21*(1-g_a) + p_22*(1-g_a)**2 + p_23*(1-G_a*(1+z))
 
     Omega_m_z = func_Omega_comp_z(z, Omega_m_0, Omega_m_0, Omega_w_0)
 
@@ -112,4 +109,3 @@ def func_r_vir(z, M, Omega_0, Omega_m_0, Omega_w_0, G_a):
     """
     Delta_vir = func_Delta_vir(z, Omega_m_0, Omega_w_0, G_a)
     return (3. * M / (4. * np.pi * func_rho_comp_0(Omega_0) * Delta_vir ))**(1./3.)
-

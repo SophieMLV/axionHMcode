@@ -2,22 +2,52 @@
 
 import numpy as np
 from scipy import optimize, integrate
-from scipy.interpolate import interp1d
-#from astropy import constants as const
+from astropy import constants as const
+from cosmology.overdensities import func_r_vir
+from HMcode_params import HMCode_param_dic
+from cold_density_profile import NFW_profile
 
-from cosmology.variance import *
-from cosmology.overdensities import *
-from cosmology.basic_cosmology import *
-from .HMcode_params import *
-from .cold_density_profile import *
+def getRhoCrit():
+    """ Returns critical comoving density of the universe
 
+    Return value is in units of [solar masses/(cMpc)^3*h^2]
 
+    :return: critical comoving density
+    :rtype: float"""
+    G = 6.674*10**(-29)/(3.086*10**16)**3 # in (cMpc)^3/(kg*s^2)
+    H_z = 100/(3.086*10**19) # in 1/s
+    solar_mass = 2*10**30 # in kg
+    return 3*H_z**2/(8*np.pi*G)/solar_mass
 
+def getKJeans(z, OMEGA_M, little_h, m_a):
+    # in cMpc^-1
+    return 66.5*(1+z)**(-1/4)*(OMEGA_M*little_h**2/0.12)**(1/4)*(m_a/10**(-22))**(1/2)
+
+def getLJeans(z, OMEGA_M, little_h, m_a):
+    # assume spherical basis functions (not plane waves)
+    kJeq = getKJeans(z, OMEGA_M, little_h, m_a)
+    return np.pi/kJeq # cMpc
+
+def getMJeq(z, OMEGA_M, little_h, m_a):
+    # returns mass in M_sun/h
+    rhocrit = getRhoCrit() # solar masses/(cMpc)^3*h^2
+    lJeq = getLJeans(z, OMEGA_M, little_h, m_a) # cMpc
+    lJeq = lJeq*little_h # cMpc/h
+    MJeq = 4/3*np.pi*lJeq**3*rhocrit*OMEGA_M # M_sun/h
+    return MJeq # M_sun/h
+
+def MaxofMc(M_c, beta1, beta2, z, OMEGA_M, c_frac, little_h, m_a):
+    # expects M_c in M_sun/h
+    MJeq = getMJeq(z, OMEGA_M, little_h, m_a) # M_sun/h
+    OMEGA_F = OMEGA_M*(1-c_frac)
+    OMEGA_C = OMEGA_M*c_frac
+    Max = (1 + (M_c/MJeq)**(-beta1))**(-beta2)*OMEGA_F/OMEGA_C*M_c
+    return Max # in M_sun/h
 
 def func_core_radius(M, cosmo_dic):
     """
-    M in solar_mass/h
-    computes the core radius of the soliton given 
+    M in solar_mass/h, cold halo mass
+    computes the core radius of the soliton given
     as in https://arxiv.org/abs/2007.08256 eq. 8
     returns r in Mpc/h
     """
@@ -31,8 +61,8 @@ def func_core_radius(M, cosmo_dic):
     h_bar = 1.0545718176461565e-34 #const.hbar.value
     m_ax = cosmo_dic['m_ax'] * 1.78266269594644e-36 # in kg
     r_core = 2 * np.pi * h_bar / (7.5 * m_ax * v_vir) # in m
-    
-    return r_core / (3.086e+22) * cosmo_dic['h'] * (1+cosmo_dic['z'])**(-1./2.) # in Mpc/h
+
+    return r_core / (3.086e+22) * cosmo_dic['h'] * (1+cosmo_dic['z'])**(-1./2.) # in cMpc/h
 
 
 
@@ -50,7 +80,7 @@ def func_rho_soliton(r, M, cosmo_dic, rho_central_param):
     A = (1+z) * 0.019 * (m_ax/1e-22)**(-2)
     x_c = func_core_radius(M, cosmo_dic) * 1e3 / cosmo_dic['h'] #in the formula we need units kpc
     r_in_formula = r * 1e3 / cosmo_dic['h']  #in the formula we need units kpc
-    
+
     if isinstance(M, (int, float)) == True:
         return A * rho_central_param / ( x_c**4 * (1 + 0.091 * (r_in_formula/x_c)**2)**8 )\
                * cosmo_dic['h']**2 * 1e18 #transform from solar_mass/pc^3 to solar_mass/pc^3 * h^2
@@ -63,41 +93,40 @@ def func_rho_soliton(r, M, cosmo_dic, rho_central_param):
 
 def func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, M_cut, rho_central_param, hmcode_params, eta_given=False, axion_dic=None):
     """
-    r_arr in Mpc/h, M and M_cut in solar_mass/h
+    r_arr in Mpc/h, M in solar_mass/h
     returns the axion density profile
-    with a solition core and a NFW profile in the 
-    outer region and with the free patameter 
+    with a solition core and a NFW profile in the
+    outer region and with the free patameter
     rho_central_param. This free parameter is set such that
-    we get the correct mass of the soliton halo, 
+    we get the correct mass of the soliton halo,
     see func_central_density_param
     the density profile has units solar_mass/Mpc^3 * h^2
     """
     #distinguish whether M is an array or a scalar
     if isinstance(M, (int, float)) == True:
         #there is no axion halo, if the cold halo is below a cut-off
-        if rho_central_param == 0 or M_cut > M:
+        if rho_central_param == 0:
             if isinstance(r_arr, (int, float)) == True:
                 return 0.0
             else:
                 return np.zeros(len(r_arr))
         else:
-            #hmcode_params = HMCode_param_dic(cosmo_dic, power_spec_dic_sigma['k'], power_spec_dic_sigma['cold'])
             NFW = cosmo_dic['omega_ax_0']/cosmo_dic['omega_db_0'] * \
                           NFW_profile(M, r_arr, power_spec_dic['k'], power_spec_dic['power_cold'], cosmo_dic, 
                                       hmcode_params, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_db_0'], eta_given = eta_given, axion_dic=axion_dic)
             soliton = func_rho_soliton(r_arr, M, cosmo_dic, rho_central_param)
-            
+
             idx_arr = np.argwhere(np.diff(np.sign(NFW - soliton))).flatten() #found the intersection points
             if len(idx_arr)<=0:
                 return soliton
             else:
                 return np.where(r_arr > r_arr[idx_arr[-1]], NFW, soliton)
-    
+
     else:
         return_arr = []
         #hmcode_params = HMCode_param_dic(cosmo_dic, power_spec_dic_sigma['k'], power_spec_dic_sigma['cold'])
         for idx, m in enumerate(M):
-            if rho_central_param[idx] == 0 or M_cut > m:
+            if rho_central_param[idx] == 0:
                 if isinstance(r_arr, (int, float)) == True:
                     return_arr.append(0.0)
                 else:
@@ -107,7 +136,7 @@ def func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, M_cut, rho_central
                               NFW_profile(m, r_arr, power_spec_dic['k'], power_spec_dic['power_cold'], cosmo_dic, 
                                           hmcode_params, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_db_0'], eta_given = eta_given, axion_dic=axion_dic)
                 soliton = func_rho_soliton(r_arr, m, cosmo_dic, rho_central_param[idx])
-                
+
                 idx_arr = np.argwhere(np.diff(np.sign(NFW - soliton))).flatten() #found the intersection points
                 if len(idx_arr)<=0:
                     return_arr.append(soliton)
@@ -118,11 +147,11 @@ def func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, M_cut, rho_central
         
 def func_ax_halo_mass(M, cosmo_dic, power_spec_dic, M_cut, rho_central_param, hmcode_params, eta_given=False, axion_dic=None):
     """
-    M and M_cut in solar_mass/h
+    M in solar_mass/h
     The free parameter rho_central_param is set such that
-    we get the correct mass of the soliton halo, 
+    we get the correct mass of the soliton halo,
     see func_central_density_param
-    returns the axion halo mass by integrating the halo 
+    returns the axion halo mass by integrating the halo
     density profile in units of solar_mass/h
     """
     #distinguish whether M is an array or a scalar
@@ -148,129 +177,126 @@ def func_ax_halo_mass(M, cosmo_dic, power_spec_dic, M_cut, rho_central_param, hm
 
 def func_central_density_param(M, cosmo_dic, power_spec_dic, M_cut, eta_given=False, axion_dic=None):
     """
-    M and M_cut in solar_mass/h
-    The central density of the soliton profile 
+    M in solar_mass/h
+    The central density of the soliton profile
     has to be change in such a way that the total
-    mass of the axion halo matches the abundance,
-    ie M_ax_halo = Omega_ax/Omega_cold * M_cold_halo
+    mass of the axion halo matches the target value,
+    ie M_ax_halo = MaxofMc(Mc)
     """
     #distinguish whether M is an array or a scalar
+    c_frac = 1 - cosmo_dic['omega_ax_0']/cosmo_dic['omega_m_0'] # 1 - ax_frac = 1 - f
+    hmcode_params = HMCode_param_dic(cosmo_dic, power_spec_dic['k'], power_spec_dic['power_cold'])
     if isinstance(M, (int, float)) == True:
-        if M < M_cut:
-            return np.array(0.0)
+        r_c = func_core_radius(M, cosmo_dic) 
         
+        #need a gues to find the correct central_dens_param:
+        #guess is set via Omega_ax/Omega_cold * M = int_0_rvir \rho *r^2 dr
+        #so we need the soliton and NFW part
+        def integrand_ax(x):
+            return func_dens_profile_ax(x, M, cosmo_dic, power_spec_dic, M_cut, 1., eta_given=eta_given, axion_dic=axion_dic)*x**2
+        #integral_soliton = integrate.quad(integrand_ax, 0, r_c)[0] # ALEX MODIF
+        xsamples = np.linspace(1e-6, r_c, 2000)
+        integral_soliton = integrate.trapezoid(integrand_ax(xsamples), x=xsamples)
+        
+        r_arr = np.geomspace(1e-10 , 2*r_c, 2000)
+        integrand_cold = NFW_profile(M, r_arr, power_spec_dic['k'], power_spec_dic['cold'], cosmo_dic, hmcode_params, cosmo_dic['Omega_db_0'], 
+                                        cosmo_dic['Omega_db_0'], eta_given = eta_given, axion_dic=axion_dic) \
+                            *r_arr**2 * cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0']
+        integral_NFW = integrate.simps(y=integrand_cold, x = r_arr)
+        integral_NFW = MaxofMc(integral_NFW, axion_dic['beta1'], axion_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], c_frac, cosmo_dic['h'], cosmo_dic['m_ax'])
+
+        
+        guess = (M +  integral_NFW) / integral_soliton
+        
+        #find the central density parameter by solving the eq: 
+        #M_ax_halo = Omega_ax/Omega_cold * M_cold_halo
+        def func_find_root(dens):
+            return func_ax_halo_mass(M, cosmo_dic, power_spec_dic, M_cut, dens, hmcode_params, eta_given=eta_given, axion_dic=axion_dic) - cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0'] * M
+        
+        #dens_param = optimize.brentq(func_find_root, 1e-2*guess, 1e4*guess, rtol=1e-3) # ALEX MODIF
+        
+        #if np.abs(guess - dens_param) > 100:
+        #        dens_param_arr.append(0.)
+        #else:
+        #    return float(dens_param)
+        
+        dens_param = optimize.root(func_find_root, x0 = guess).x
+        #sometimes the solution is not really a solution,
+        #so set than the central density paameter to zero, ie no solution can be found
+        if np.abs(guess - dens_param) > 10.:
+            return 0.
         else:
-            r_c = func_core_radius(M, cosmo_dic) 
-            hmcode_params = HMCode_param_dic(cosmo_dic, power_spec_dic['k'], power_spec_dic['power_cold'])
-            
-            #need a gues to find the correct central_dens_param:
-            #guess is set via Omega_ax/Omega_cold * M = int_0_rvir \rho *r^2 dr
-            #so we need the soliton and NFW part
-            def integrand_ax(x):
-                return func_dens_profile_ax(x, M, cosmo_dic, power_spec_dic, M_cut, 1., eta_given=eta_given, axion_dic=axion_dic)*x**2
-            #integral_soliton = integrate.quad(integrand_ax, 0, r_c)[0] # ALEX MODIF
-            xsamples = np.linspace(1e-6, r_c, 2000)
-            integral_soliton = integrate.trapezoid(integrand_ax(xsamples), x=xsamples)
-            
-            r_arr = np.geomspace(1e-10 , 2*r_c, 2000)
-            integrand_cold = NFW_profile(M, r_arr, power_spec_dic['k'], power_spec_dic['cold'], cosmo_dic, hmcode_params, cosmo_dic['Omega_db_0'], 
-                                         cosmo_dic['Omega_db_0'], eta_given = eta_given, axion_dic=axion_dic) \
-                             *r_arr**2 * cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0']
-            integral_NFW = integrate.simps(y=integrand_cold, x = r_arr)
-            
-            guess = (M +  integral_NFW) / integral_soliton
-            
-            #find the central density parameter by solving the eq: 
-            #M_ax_halo = Omega_ax/Omega_cold * M_cold_halo
-            def func_find_root(dens):
-                return func_ax_halo_mass(M, cosmo_dic, power_spec_dic, M_cut, dens, hmcode_params, eta_given=eta_given, axion_dic=axion_dic) - cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0'] * M
-            
-            #dens_param = optimize.brentq(func_find_root, 1e-2*guess, 1e4*guess, rtol=1e-3) # ALEX MODIF
-            
-            #if np.abs(guess - dens_param) > 100:
-            #        dens_param_arr.append(0.)
-            #else:
-            #    return float(dens_param)
-            
-            dens_param = optimize.root(func_find_root, x0 = guess).x
-            #sometimes the solution is not really a solution,
-            #so set than the central density paameter to zero, ie no solution can be found
-            if np.abs(guess - dens_param) > 10.:
-                return 0.
-            else:
-                return float(dens_param)
+            return float(dens_param)
             
     else:
         dens_param_arr = []
         r_c = func_core_radius(M, cosmo_dic)
-        hmcode_params = HMCode_param_dic(cosmo_dic, power_spec_dic['k'], power_spec_dic['power_cold'])
         for idx, m in enumerate(M):
-            if m < M_cut:
+
+            #need a gues to find the correct central_dens_param:
+            #guess is set via Omega_ax/Omega_cold * M = int_0_rvir \rho *r^2 dr
+            #so we need the soliton and NFW part
+            def integrand_ax(x):
+                return func_dens_profile_ax(x, m, cosmo_dic, power_spec_dic, M_cut, 1., hmcode_params, eta_given=eta_given, axion_dic=axion_dic)*x**2
+            #integral_soliton = integrate.quad(integrand_ax, 0, r_c[idx])[0] # ALEX MODIF
+            xsamples = np.linspace(1e-6, r_c[idx], 2000)
+            integral_soliton = integrate.trapezoid(integrand_ax(xsamples), x=xsamples)
+
+            r_arr = np.geomspace(1e-15 , r_c[idx], 2000)
+            integrand_cold = NFW_profile(m, r_arr, power_spec_dic['k'], power_spec_dic['power_cold'], cosmo_dic, hmcode_params, cosmo_dic['Omega_db_0'], 
+                                            cosmo_dic['Omega_db_0'], eta_given = eta_given, axion_dic=axion_dic)*r_arr**2 * cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0'] 
+            integral_NFW = integrate.simps(y=integrand_cold, x = r_arr)
+            integral_NFW = MaxofMc(integral_NFW, axion_dic['beta1'], axion_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], c_frac, cosmo_dic['h'], cosmo_dic['m_ax'])
+
+            
+            
+            guess = integral_NFW / integral_soliton
+            
+            #find the central density parameter by solving the eq: 
+            #M_ax_halo = Omega_ax/Omega_cold * M_cold_halo
+            def func_find_root(dens):
+                return func_ax_halo_mass(m, cosmo_dic, power_spec_dic, M_cut, dens, hmcode_params, eta_given=eta_given, axion_dic=axion_dic) - cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0'] * m
+
+            #dens_param = optimize.brentq(func_find_root, 1e-4*guess, 1e4*guess, rtol=1e-3) # ALEX MODIF
+            
+            #if np.abs(guess - dens_param) > 100:
+            #    dens_param_arr.append(0.)
+            #else:
+            #    dens_param_arr.append(float(dens_param))
+
+
+            dens_param = optimize.root(func_find_root, x0 = guess).x
+
+            #func_find_root = lambda x: np.abs(func_find_root(x))
+
+            #dens_param_test = optimize.minimize(func_find_root, x0=guess, method='Nelder-Mead', bounds=[(1e-3*guess, 2*guess)]).x
+
+            #print(dens_param, dens_param_test)
+            
+            #sometimes the solution is not really a solution,
+            #so set than the central density paameter to zero, ie so solution can be found
+            if np.abs(guess - dens_param) > 10:
                 dens_param_arr.append(0.)
             else:
-                #need a gues to find the correct central_dens_param:
-                #guess is set via Omega_ax/Omega_cold * M = int_0_rvir \rho *r^2 dr
-                #so we need the soliton and NFW part
-                def integrand_ax(x):
-                    return func_dens_profile_ax(x, m, cosmo_dic, power_spec_dic, M_cut, 1., hmcode_params, eta_given=eta_given, axion_dic=axion_dic)*x**2
-                #integral_soliton = integrate.quad(integrand_ax, 0, r_c[idx])[0] # ALEX MODIF
-                xsamples = np.linspace(1e-6, r_c[idx], 2000)
-                integral_soliton = integrate.trapezoid(integrand_ax(xsamples), x=xsamples)
-
-                r_arr = np.geomspace(1e-15 , r_c[idx], 2000)
-                integrand_cold = NFW_profile(m, r_arr, power_spec_dic['k'], power_spec_dic['power_cold'], cosmo_dic, hmcode_params, cosmo_dic['Omega_db_0'], 
-                                             cosmo_dic['Omega_db_0'], eta_given = eta_given, axion_dic=axion_dic)*r_arr**2 * cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0'] 
-                integral_NFW = integrate.simps(y=integrand_cold, x = r_arr)
-                
-                
-                guess = integral_NFW / integral_soliton
-                
-                #find the central density parameter by solving the eq: 
-                #M_ax_halo = Omega_ax/Omega_cold * M_cold_halo
-                def func_find_root(dens):
-                    return func_ax_halo_mass(m, cosmo_dic, power_spec_dic, M_cut, dens, hmcode_params, eta_given=eta_given, axion_dic=axion_dic) - cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0'] * m
-
-                #dens_param = optimize.brentq(func_find_root, 1e-4*guess, 1e4*guess, rtol=1e-3) # ALEX MODIF
-                
-                #if np.abs(guess - dens_param) > 100:
-                #    dens_param_arr.append(0.)
-                #else:
-                #    dens_param_arr.append(float(dens_param))
-
-
-                dens_param = optimize.root(func_find_root, x0 = guess).x
-
-                #func_find_root = lambda x: np.abs(func_find_root(x))
-
-                #dens_param_test = optimize.minimize(func_find_root, x0=guess, method='Nelder-Mead', bounds=[(1e-3*guess, 2*guess)]).x
-
-                #print(dens_param, dens_param_test)
-                
-                #sometimes the solution is not really a solution,
-                #so set than the central density paameter to zero, ie so solution can be found
-                if np.abs(guess - dens_param) > 10:
-                    dens_param_arr.append(0.)
-                else:
-                    dens_param_arr.append(float(dens_param))
+                dens_param_arr.append(float(dens_param))
                 
         return dens_param_arr
-            
+
 
 
 def func_dens_profile_ax_kspace(k, M, cosmo_dic, power_spec_dic, M_cut, central_dens_param, hmcode_params, eta_given=False, axion_dic=None):
     """
-    k in units of h/Mpc and M and M_cut in solar_mass/h
-    The free parameter rho_central_param is set such that
-    we get the correct mass of the soliton halo, 
+    k in units of h/Mpc and M in solar_mass/h
+    The free parameter central_dens_param is set such that
+    we get the correct mass of the soliton halo,
     see func_central_density_param
     return kspace denisty profile for the axion halo
     the normalised density profile is demensionles
-    """ 
+    """
     #the kspace density profile is defined via
     # \rho(k) = 4*\pi* int_0^r_vir \rho(r) * r^2 * sin(kr)/kr dr
     M_ax = func_ax_halo_mass(M, cosmo_dic, power_spec_dic, M_cut, central_dens_param, hmcode_params, axion_dic=axion_dic)
     r_vir = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
-    hmcode_params = HMCode_param_dic(cosmo_dic, power_spec_dic['k'], power_spec_dic['power_cold']) 
     
     #distinguish whether M is an array or a scalar
     if isinstance(M, (int, float)) == True:
@@ -278,7 +304,7 @@ def func_dens_profile_ax_kspace(k, M, cosmo_dic, power_spec_dic, M_cut, central_
         dens_profile_arr = func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, M_cut, central_dens_param, hmcode_params, eta_given=eta_given, axion_dic=axion_dic) \
                            * r_arr**2 * np.sin(np.outer(k, r_arr)) / np.outer(k, r_arr)
         return list(4 * np.pi * integrate.simps(y=dens_profile_arr, x = r_arr, axis=-1) / M_ax)
-        
+
     else:
         dens_profile_kspace_arr = []
         for idx, m in enumerate(M):

@@ -100,7 +100,7 @@ power_spec_interp_dic_LCDM = lin_power_spectrum.func_power_spec_interp_dic(power
 print('-' * 50)
 M_arr = np.logspace(cosmos['M_min'], cosmos['M_max'], 100)
 print("Calculate axion quantities; cut-off mass, central density scale of axion density profile and axion halo mass.")
-axion_param = axion_params.func_axion_param_dic(M_arr, cosmos, power_spec_interp_dic_ax)
+axion_param = axion_params.func_axion_param_dic(M_arr, cosmos, power_spec_interp_dic_ax, eta_given=False)
 print("Create dictionary with parameters of HMCode2020")
 hmcode_params = HMcode_params.HMCode_param_dic(cosmos, power_spec_interp_dic_ax['k'], power_spec_interp_dic_ax['power_cold'])
 hmcode_params_LCDM = HMcode_params.HMCode_param_dic(cosmos_LCDM, power_spec_interp_dic_LCDM['k'], power_spec_interp_dic_LCDM['power_cold'])
