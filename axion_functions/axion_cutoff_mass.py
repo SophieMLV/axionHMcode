@@ -1,6 +1,8 @@
 """functions for axions and when they cluster, ie evolve non-linear"""
 
 import numpy as np
+from scipy import optimize
+
 from cosmology.overdensities import func_r_vir
 from halo_model.cold_density_profile import func_conc_param, func_for_norm_factor
 from scipy.interpolate import RegularGridInterpolator

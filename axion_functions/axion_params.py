@@ -22,7 +22,7 @@ def func_axion_param_dic(M, cosmo_dic, power_spec_dic, eta_given=False):
     #central density parameter, to ensure, that the axion halo has the correct mass
     axion_param_dic['M_int'] = deepcopy(M)
     #print('Line 2')
-    axion_param_dic['central_dens'] = func_central_density_param(axion_param_dic['M_int'], cosmo_dic, power_spec_dic, eta_given=eta_given, axion_dic = axion_param_dic)
+    axion_param_dic['central_dens'] = func_central_density_param(axion_param_dic['M_int'], cosmo_dic, power_spec_dic, axion_param_dic['M_cut'], eta_given=eta_given, axion_dic = axion_param_dic)
         
     #for some halo mass no central density parameter can be found, ie there is no axion halo for this halo mass and M_int must be reduced
     #print('Line 3')

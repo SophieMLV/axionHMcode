@@ -26,6 +26,7 @@ def func_non_lin_PS_matter(M, k, PS, cosmo_dic, hmcode_dic, Omega_0,
     """     
     dens_profile_arr = func_dens_profile_kspace(M, k, PS, cosmo_dic, hmcode_dic, Omega_0, eta_given = eta_given, axion_dic=axion_dic)
     halo_mass_func_arr = func_halo_mass_function(M, k, PS, cosmo_dic, Omega_0)
+    f_ax = cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_m_0']
     
     integrand_arr_one = M[:, None]**2 * halo_mass_func_arr[:, None] * dens_profile_arr**2 
     # No neutrinos in halos

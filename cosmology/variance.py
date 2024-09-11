@@ -38,13 +38,13 @@ def func_sigma_r(R, k, PS):
     #sigma_squared = np.trapz(integrand, x=k, axis=-1) / (2. * np.pi ** 2) 
     if isinstance(R, (int, float)) == True:
         integrand = PS * spherical_tophat_window_function(R, k)[0] ** 2 * k ** 2
-        sigma_squared = trapz(integrand, k) / (2. * np.pi ** 2)
+        sigma_squared = np.trapz(integrand, k) / (2. * np.pi ** 2)
     else:
         sigma_squared = np.zeros(len(R))
     
         for i in range(len(R)):
             integrand = PS * spherical_tophat_window_function(R[i], k)[0] ** 2 * k ** 2
-            sigma_squared[i] = trapz(integrand, k) / (2. * np.pi ** 2)
+            sigma_squared[i] = np.trapz(integrand, k) / (2. * np.pi ** 2)
 
     return np.sqrt(sigma_squared)
 
