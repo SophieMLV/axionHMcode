@@ -160,25 +160,25 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic, M_cut, eta_given=Fa
             return np.array(0.0)
         
         else:
-            r_c = func_core_radius(M, cosmo_dic) 
+            # r_c = func_core_radius(M, cosmo_dic) 
             hmcode_params = HMCode_param_dic(cosmo_dic, power_spec_dic['k'], power_spec_dic['power_cold'])
             
-            #need a gues to find the correct central_dens_param:
-            #guess is set via Omega_ax/Omega_cold * M = int_0_rvir \rho *r^2 dr
-            #so we need the soliton and NFW part
-            def integrand_ax(x):
-                return func_dens_profile_ax(x, M, cosmo_dic, power_spec_dic, M_cut, 1., eta_given=eta_given, axion_dic=axion_dic)*x**2
-            #integral_soliton = integrate.quad(integrand_ax, 0, r_c)[0] # ALEX MODIF
-            xsamples = np.linspace(1e-6, r_c, 2000)
-            integral_soliton = integrate.trapezoid(integrand_ax(xsamples), x=xsamples)
+            # #need a gues to find the correct central_dens_param:
+            # #guess is set via Omega_ax/Omega_cold * M = int_0_rvir \rho *r^2 dr
+            # #so we need the soliton and NFW part
+            # def integrand_ax(x):
+            #     return func_dens_profile_ax(x, M, cosmo_dic, power_spec_dic, M_cut, 1., eta_given=eta_given, axion_dic=axion_dic)*x**2
+            # #integral_soliton = integrate.quad(integrand_ax, 0, r_c)[0] # ALEX MODIF
+            # xsamples = np.linspace(1e-6, r_c, 2000)
+            # integral_soliton = integrate.trapezoid(integrand_ax(xsamples), x=xsamples)
             
-            r_arr = np.geomspace(1e-10 , 2*r_c, 2000)
-            integrand_cold = NFW_profile(M, r_arr, power_spec_dic['k'], power_spec_dic['cold'], cosmo_dic, hmcode_params, cosmo_dic['Omega_db_0'], 
-                                         cosmo_dic['Omega_db_0'], eta_given = eta_given, axion_dic=axion_dic) \
-                             *r_arr**2 * cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0']
-            integral_NFW = integrate.simps(y=integrand_cold, x = r_arr)
+            # r_arr = np.geomspace(1e-10 , 2*r_c, 2000)
+            # integrand_cold = NFW_profile(M, r_arr, power_spec_dic['k'], power_spec_dic['cold'], cosmo_dic, hmcode_params, cosmo_dic['Omega_db_0'], 
+            #                              cosmo_dic['Omega_db_0'], eta_given = eta_given, axion_dic=axion_dic) \
+            #                  *r_arr**2 * cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0']
+            # integral_NFW = integrate.simps(y=integrand_cold, x = r_arr)
             
-            guess = (M +  integral_NFW) / integral_soliton
+            guess = 1.#(M +  integral_NFW) / integral_soliton
             
             #find the central density parameter by solving the eq: 
             #M_ax_halo = Omega_ax/Omega_cold * M_cold_halo
@@ -202,7 +202,7 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic, M_cut, eta_given=Fa
             
     else:
         dens_param_arr = []
-        r_c = func_core_radius(M, cosmo_dic)
+        # r_c = func_core_radius(M, cosmo_dic)
         hmcode_params = HMCode_param_dic(cosmo_dic, power_spec_dic['k'], power_spec_dic['power_cold'])
         for idx, m in enumerate(M):
             if m < M_cut:
@@ -211,19 +211,19 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic, M_cut, eta_given=Fa
                 #need a gues to find the correct central_dens_param:
                 #guess is set via Omega_ax/Omega_cold * M = int_0_rvir \rho *r^2 dr
                 #so we need the soliton and NFW part
-                def integrand_ax(x):
-                    return func_dens_profile_ax(x, m, cosmo_dic, power_spec_dic, M_cut, 1., hmcode_params, eta_given=eta_given, axion_dic=axion_dic)*x**2
-                #integral_soliton = integrate.quad(integrand_ax, 0, r_c[idx])[0] # ALEX MODIF
-                xsamples = np.linspace(1e-6, r_c[idx], 2000)
-                integral_soliton = integrate.trapezoid(integrand_ax(xsamples), x=xsamples)
+                # def integrand_ax(x):
+                #     return func_dens_profile_ax(x, m, cosmo_dic, power_spec_dic, M_cut, 1., hmcode_params, eta_given=eta_given, axion_dic=axion_dic)*x**2
+                # #integral_soliton = integrate.quad(integrand_ax, 0, r_c[idx])[0] # ALEX MODIF
+                # xsamples = np.linspace(1e-6, r_c[idx], 2000)
+                # integral_soliton = integrate.trapezoid(integrand_ax(xsamples), x=xsamples)
 
-                r_arr = np.geomspace(1e-15 , r_c[idx], 2000)
-                integrand_cold = NFW_profile(m, r_arr, power_spec_dic['k'], power_spec_dic['power_cold'], cosmo_dic, hmcode_params, cosmo_dic['Omega_db_0'], 
-                                             cosmo_dic['Omega_db_0'], eta_given = eta_given, axion_dic=axion_dic)*r_arr**2 * cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0'] 
-                integral_NFW = integrate.simps(y=integrand_cold, x = r_arr)
+                # r_arr = np.geomspace(1e-15 , r_c[idx], 2000)
+                # integrand_cold = NFW_profile(m, r_arr, power_spec_dic['k'], power_spec_dic['power_cold'], cosmo_dic, hmcode_params, cosmo_dic['Omega_db_0'], 
+                #                              cosmo_dic['Omega_db_0'], eta_given = eta_given, axion_dic=axion_dic)*r_arr**2 * cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0'] 
+                # integral_NFW = integrate.simps(y=integrand_cold, x = r_arr)
                 
                 
-                guess = integral_NFW / integral_soliton
+                guess = 1. #integral_NFW / integral_soliton
                 
                 #find the central density parameter by solving the eq: 
                 #M_ax_halo = Omega_ax/Omega_cold * M_cold_halo
@@ -248,7 +248,7 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic, M_cut, eta_given=Fa
                 
                 #sometimes the solution is not really a solution,
                 #so set than the central density paameter to zero, ie so solution can be found
-                if np.abs(guess - dens_param) > 10:
+                if np.abs(func_find_root(dens_param)) > 1e-2*cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_db_0'] * m:
                     dens_param_arr.append(0.)
                 else:
                     dens_param_arr.append(float(dens_param))
