@@ -23,21 +23,20 @@ An example python file is given in "example_file.py". To run the file you have t
 The 'AxionHMcode' can also use the parameters from the 'HMCode-2020' in [Mead et al.](https://arxiv.org/abs/2009.01858) which improves the predictions in the case of a LCDM cosmology with massive neutrinos. The parameters can be switched on by setting the corresponding parameters to 'True' or 'False' in the function for the non-linear power spectrum. The parameters are the smoothing parameters, 'alpha', the halo bloating term, 'eta_given', the one halo damping on large scales, 'one_halo_damping', and the two halo damping on large scales, 'two_halo_damping'.
 
 
-## Code Update Based on [Dome et al.]()
+## Added Features
+Alex Laguë implemented Numba in this updated version to increase the speed of the code. The computation time is now around one minute on a single-core computer. Here most of the computation time is used to calculate the lineat power spectrum with 'axionCAMB'. Without the computation of the linear power sepctrum the code needs around 15 second.
 
-[Dome et al.]() presented an improved version of 'AxionHMcode' by resolving some bugs and introducing new parameters which are calibrated from simulations presented in this paper.
-The changes in the code are the following:
-1. the axion-mass cold mass relation, $'M_a(M_c)'$, is now modeled as a broken power law (see Eq. 51 in [Dome et al.]()) which ensures the old relation of $'M_a(M_c) = \Omega_a/\Omega_c M_c'$ above a defined cut-off mass. This new relation is inspired by the simulations and is calibrated by them. 
-2. The authors introduced new smoothing parameters $'\alpha'$ for the cold-cold power spectrum and the cross-power spectrum which depend on the axion mass and axion density. The exact form of these parameters was calibrated by simulations.
-3. The two halo term is now calculated by the linear power spectrum only. The difference between the total two halo term is minor and the speed up is increased. There is still the option to use the full two halo term by setting the parameter 'full_2h' to 'True'. 
-4. A bug in the cold density profile when using the halo bloating term was corrected.
-5. The relations of the critical density threshold, $'\delta_c'$ and the virial overdensity, $'\Delta_{\mathrm{vir}}'$, are now calculated as in 'HMCode-2020' Eq. A1 and A2. This ensures that 'AxionHMcode' and 'HMCode-2020' agree in the case of a LCDM cosmology.
-6. The minimum concentration is now 5.196 as found in [Mead et al.](https://arxiv.org/abs/2009.01858).
-7. The speed of the code was increased by reducing the calls of numerical functions. The run-time of the code is now under 1 minute on a single-core machine. 
+Furthermore, Alex Laguë and Keir Rogers also included the optional parameters alpha_1, alpha_2, gamma_1, gamma_2 defined in [Dentler er al.](https://arxiv.org/abs/2111.01199) Eq. (36). To use them, just include them in your dictionary of cosmological parameters (the "cosmo_dic" file) before running the "params" and "power spectra" calculation using e.g. cosmo_dic['alpha_1'] = X. They are not yet included in the input file.
 
 
-## More Added Features
-Alex Laguë implemented Numba in this updated version to increase the speed of the code. Furthermore, Alex Laguë and Keir Rogers also included the optional parameters alpha_1, alpha_2, gamma_1, gamma_2 defined in [Dentler er al.](https://arxiv.org/abs/2111.01199) Eq. (36). To use them, just include them in your dictionary of cosmological parameters (the "cosmo_dic" file) before running the "params" and "power spectra" calculation using e.g. cosmo_dic['alpha_1'] = X. They are not yet included in the input file.
+## Resolved bugs
+
+With the help of Tibor Dome a few bugs were resolved in 'AxionHMcode'. The code is now consistent with 'HMCode-2020' from 'camb'.
+
+1. The two halo term is now calculated by the linear power spectrum only. The difference between the total two halo term is minor and the speed up is increased. There is still the option to use the full two halo term by setting the parameter 'full_2h' to 'True'. 
+2. A bug in the cold density profile when using the halo bloating term was corrected.
+3. The relations of the critical density threshold, $'\delta_c'$ and the virial overdensity, $'\Delta_{\mathrm{vir}}'$, are now calculated as in 'HMCode-2020' Eq. A1 and A2. This ensures that 'AxionHMcode' and 'HMCode-2020' agree in the case of a LCDM cosmology.
+4. The minimum concentration is now 5.196 as found in [Mead et al.](https://arxiv.org/abs/2009.01858).
 
 ## Contact data
 
