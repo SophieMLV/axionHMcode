@@ -28,6 +28,7 @@ def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic,
     k = power_spec_dic['k']
     PS_cold = power_spec_dic['power_cold']
     PS_ax = power_spec_dic['power_axion']
+    alpha_param = hmcode_dic['alpha']   
 
     #########################################
     ############# Cold matter term ##########
@@ -140,7 +141,7 @@ def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic,
     ##########################################
     ############# Cross term #################
     ##########################################
-    PS_total_cross = axion_dic['frac_cluster']*(one_halo_term_cross+two_halo_term_cross) + (1-axion_dic['frac_cluster'])*np.sqrt(PS_ax * PS_cold_nonlin)
+    PS_total_cross = axion_dic['frac_cluster']*((one_halo_term_cross**(alpha_param[1]) + two_halo_term_cross**(alpha_param[1]))**(1/alpha_param[1])) + (1-axion_dic['frac_cluster'])*np.sqrt(PS_ax * PS_cold_nonlin)
 
     ###########################################
     ############ axion term ###################
