@@ -36,29 +36,31 @@ def func_z_formation(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, f = 0.01):
         # Test also if we can find a root
         return np.array([optimize.brentq(func_find_root, z, 100., args=(m)) if func_find_root(z, m)*func_find_root(100., m) < 0 else z for m in M])
 
-def func_conc_param(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, recalc_c = False):
+def func_conc_param(M_arr, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma, recalc_c = False):
     """
     k_sigma is in units of h/Mpc, PS_sigma in (Mpc/h)^3 and M in solar_mass/h
     NOTE: Omega_0 must match with chosen PS_sigma
     returns the concentration parameter as defined in
     https://arxiv.org/abs/2009.01858 in eq. 20
     """
+    # print('hier')
     global _concentration_interpolator_cache # CDM interpolator
     B = 5.196   
     concentrations = []    
     
     if _concentration_interpolator_cache is None or recalc_c:
         # First time the function is called, create the interpolator
-        mass_range = np.logspace(7, 18, num=200)
+        mass_range = np.logspace(7, 18, num=100)
         for M in mass_range:
             zf = func_z_formation(M, k_sigma, PS_sigma, cosmo_dic, Omega_0_sigma) 
             c = B*(1+zf)/(1.+cosmo_dic['z']) # Halo concentration; equation (20)
             concentrations.append(c)
         # Create an interpolation function
-        _concentration_interpolator_cache = interpolate.interp1d(mass_range, concentrations, kind='linear', fill_value="extrapolate")
+        _concentration_interpolator_cache = interpolate.interp1d(np.log(mass_range), concentrations, kind='linear', fill_value="extrapolate")
     
     # Use the cached interpolator
-    c_eval = _concentration_interpolator_cache(M)
+    # print(M_arr)
+    c_eval = _concentration_interpolator_cache(np.log(M_arr))
     return c_eval # Defined by r_vir/r_2
 
 #function for the normaliation factor in NFW profile
