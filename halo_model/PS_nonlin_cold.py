@@ -33,9 +33,9 @@ def func_non_lin_PS_matter(M, k, PS, cosmo_dic, hmcode_dic, Omega_0,
     #no neutrinos in halos
     if ax_one_halo == True:
         f_ax = cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_m_0']
-        one_halo = (1-f_ax)**2 * integrate.simps(integrand_arr_one, x = M, axis = 0)/ func_rho_comp_0(Omega_0)**2  
+        one_halo = (1-f_ax)**2 * integrate.simpson(integrand_arr_one, x = M, axis = 0)/ func_rho_comp_0(Omega_0)**2  
     else:
-        one_halo = integrate.simps(integrand_arr_one, x = M, axis = 0)/ func_rho_comp_0(Omega_0)**2  
+        one_halo = integrate.simpson(integrand_arr_one, x = M, axis = 0)/ func_rho_comp_0(Omega_0)**2  
     #one halo damping
     if one_halo_damping == True:
         one_halo = one_halo * (k/hmcode_dic['k_star'])**4 / (1+(k/hmcode_dic['k_star'])**4)
@@ -53,8 +53,8 @@ def func_non_lin_PS_matter(M, k, PS, cosmo_dic, hmcode_dic, Omega_0,
             
             #summand to take care of nummericals issues of the integral, see appendix A in https://arxiv.org/abs/2005.00009
             summand2 = func_dens_profile_kspace(np.min(M), k, PS, cosmo_dic, hmcode_dic, Omega_0, eta_given = eta_given, axion_dic=axion_dic) \
-                                * ( 1 - integrate.simps(M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None], x = M, axis = 0) / func_rho_comp_0(Omega_0)) 
-            factor2 = integrate.simps(integrand_arr_two, x = M, axis = 0) / func_rho_comp_0(Omega_0) + summand2 
+                                * ( 1 - integrate.simpson(M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None], x = M, axis = 0) / func_rho_comp_0(Omega_0)) 
+            factor2 = integrate.simpson(integrand_arr_two, x = M, axis = 0) / func_rho_comp_0(Omega_0) + summand2 
             
             two_halo = PS * factor2[0]**2 * (1-hmcode_dic['f'] * (k/hmcode_dic['k_d'])**hmcode_dic['n_d']/(1+(k/hmcode_dic['k_d'])**hmcode_dic['n_d']))
         else:
@@ -66,8 +66,8 @@ def func_non_lin_PS_matter(M, k, PS, cosmo_dic, hmcode_dic, Omega_0,
             integrand_arr_two = M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None] * dens_profile_arr
             #summand2 take care of nummericals issues of the integral, see appendix A in https://arxiv.org/abs/2005.00009
             summand2 = func_dens_profile_kspace(np.min(M), k, PS, cosmo_dic, hmcode_dic, Omega_0, eta_given = eta_given, axion_dic=axion_dic) \
-                                * ( 1 - integrate.simps(M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None], x = M, axis = 0) / func_rho_comp_0(Omega_0)) 
-            factor2 = integrate.simps(integrand_arr_two, x = M, axis = 0) / func_rho_comp_0(Omega_0) + summand2 
+                                * ( 1 - integrate.simpson(M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None], x = M, axis = 0) / func_rho_comp_0(Omega_0)) 
+            factor2 = integrate.simpson(integrand_arr_two, x = M, axis = 0) / func_rho_comp_0(Omega_0) + summand2 
             
             two_halo = PS * factor2[0]**2
         else:
