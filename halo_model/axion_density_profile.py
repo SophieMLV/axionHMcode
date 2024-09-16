@@ -130,13 +130,13 @@ def func_ax_halo_mass(M, cosmo_dic, power_spec_dic, M_cut, rho_central_param, hm
         r_vir = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'],  cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
         r_arr = np.geomspace(1e-15, r_vir, num=2000)
         integrand = func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, M_cut, rho_central_param, hmcode_params, eta_given=eta_given, axion_dic=axion_dic) * r_arr**2
-        return 4 * np.pi * integrate.simps(y=integrand, x = r_arr)
+        return 4 * np.pi * integrate.simpson(y=integrand, x = r_arr)
     else:
         integral = np.zeros(len(M))
         for i in range(len(M)):
             upper_bound = func_r_vir(cosmo_dic['z'], M[i], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'],  cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
             R_int = np.geomspace(1e-15, upper_bound, num=2000)
-            integral[i] = 4 * np.pi * integrate.simps(y=func_dens_profile_ax(R_int, M[i], cosmo_dic, power_spec_dic, M_cut, rho_central_param[i], hmcode_params, eta_given=eta_given, axion_dic=axion_dic)*R_int**2, x=R_int)
+            integral[i] = 4 * np.pi * integrate.simpson(y=func_dens_profile_ax(R_int, M[i], cosmo_dic, power_spec_dic, M_cut, rho_central_param[i], hmcode_params, eta_given=eta_given, axion_dic=axion_dic)*R_int**2, x=R_int)
             
         return integral
 
@@ -277,7 +277,7 @@ def func_dens_profile_ax_kspace(k, M, cosmo_dic, power_spec_dic, M_cut, central_
         r_arr = np.geomspace(1e-15, r_vir, num=2000)
         dens_profile_arr = func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, M_cut, central_dens_param, hmcode_params, eta_given=eta_given, axion_dic=axion_dic) \
                            * r_arr**2 * np.sin(np.outer(k, r_arr)) / np.outer(k, r_arr)
-        return list(4 * np.pi * integrate.simps(y=dens_profile_arr, x = r_arr, axis=-1) / M_ax)
+        return list(4 * np.pi * integrate.simpson(y=dens_profile_arr, x = r_arr, axis=-1) / M_ax)
         
     else:
         dens_profile_kspace_arr = []
@@ -288,7 +288,7 @@ def func_dens_profile_ax_kspace(k, M, cosmo_dic, power_spec_dic, M_cut, central_
                 r_arr = np.geomspace(1e-15, r_vir[idx], num=2000)
                 dens_profile_arr = func_dens_profile_ax(r_arr, m, cosmo_dic, power_spec_dic, M_cut, central_dens_param[idx], hmcode_params, eta_given=eta_given, axion_dic=axion_dic) \
                                    * r_arr**2 * np.sin(np.outer(k, r_arr)) / np.outer(k, r_arr)
-                dens_kspace = list(4 * np.pi * integrate.simps(y=dens_profile_arr, x = r_arr, axis=-1) / M_ax[idx] )
+                dens_kspace = list(4 * np.pi * integrate.simpson(y=dens_profile_arr, x = r_arr, axis=-1) / M_ax[idx] )
                 dens_profile_kspace_arr.append(dens_kspace)
         
         return dens_profile_kspace_arr
