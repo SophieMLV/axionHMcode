@@ -7,23 +7,32 @@ from halo_model.halo_mass_function import func_halo_mass_function
 from halo_model.axion_density_profile import func_central_density_param, MaxofMc
 from copy import deepcopy
 
-def func_axion_param_dic(M, cosmo_dic, power_spec_dic, eta_given=False):
+def func_axion_param_dic(M, cosmo_dic, power_spec_dic, hmcode_dic, concentration_param = False):
     """
     generate dictionary with parameters for axions
     M_halo is the mass of the cold matter halo in solar_mass/h
     """
+    # define the concentraion param for the cold matter profile
+    if concentration_param == True:
+        c_min = hmcode_dic['c_min']
+    else:
+        c_min = 4.
     #generate dictionary
     #print('Entered axion function')
     axion_param_dic = {}
     axion_param_dic['beta1'] = 1
     axion_param_dic['beta2'] = func_beta2(cosmo_dic, power_spec_dic, axion_dic = 'ignore')
     #cut of mass. Below this cold halo mass no axion halo exists
-    axion_param_dic['M_cut'] = func_cut_mass_axion_halo(cosmo_dic, power_spec_dic, axion_dic='ignore')
+    axion_param_dic['M_cut'] = func_cut_mass_axion_halo(cosmo_dic, power_spec_dic, c_min, axion_dic='ignore')
+    #cold halo masses for which an axion halo exists
+    #print('Line 1')
+    axion_param_dic['M_int'] = np.geomspace(axion_param_dic['M_cut'], np.max(M), num=len(M))
     #central density parameter, to ensure, that the axion halo has the correct mass
     axion_param_dic['M_int'] = deepcopy(M)
     #print('Line 2')
-    axion_param_dic['central_dens'] = func_central_density_param(axion_param_dic['M_int'], cosmo_dic, power_spec_dic, axion_param_dic['M_cut'], eta_given=eta_given, axion_dic = axion_param_dic)
-        
+    axion_param_dic['central_dens'] = func_central_density_param(axion_param_dic['M_int'], cosmo_dic, power_spec_dic, axion_param_dic['M_cut'], 
+                                                                 concentration_param=concentration_param, eta_given=False, axion_dic=axion_param_dic)
+    
     #for some halo mass no central density parameter can be found, ie there is no axion halo for this halo mass and M_int must be reduced
     #print('Line 3')
     axion_param_dic['M_int'] = axion_param_dic['M_int'] * np.where(np.array(axion_param_dic['central_dens']) <= 0, 0, 1) #set mass to zero, if central densit param is zero

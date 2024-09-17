@@ -119,5 +119,6 @@ def HMCode_param_dic(cosmo_dic, k, PS_cold):
     param_model_dic['k_star'] = func_k_star(k, PS_cold)
     param_model_dic['eta'] = func_eta(k, PS_cold)
     param_model_dic['alpha'] = func_alpha_param(cosmo_dic, k, PS_cold)
+    param_model_dic['c_min'] = 5.2
     
     return param_model_dic
