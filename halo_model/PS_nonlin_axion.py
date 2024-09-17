@@ -42,7 +42,8 @@ def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic,
     ############# Cold matter term ##########
     #########################################
     PS_cold_nonlin = func_non_lin_PS_matter(M, k, PS_cold, cosmo_dic, hmcode_dic, cosmo_dic['Omega_db_0'], 
-                                            alpha = alpha, eta_given = eta_given, ax_one_halo=False, one_halo_damping = one_halo_damping, two_halo_damping = two_halo_damping, axion_dic=axion_dic)[0]
+                                            alpha = alpha, eta_given = eta_given, ax_one_halo=False, one_halo_damping = one_halo_damping, 
+                                            two_halo_damping = two_halo_damping, concentration_param=concentration_param, full_2h=full_2h, axion_dic=axion_dic)[0]
     
     ########################################
     ##compute everything for one halo term##
