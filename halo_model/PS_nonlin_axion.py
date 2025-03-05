@@ -60,11 +60,11 @@ def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic,
                                    * dens_profile_cold_arr_2 * dens_profile_ax_arr_2 # integral over reduced array [M_cut, inf]   
     if one_halo_damping == True:
         one_halo_term_cross = (k/hmcode_dic['k_star'])**4 / (1+(k/hmcode_dic['k_star'])**4) \
-                          * integrate.simps(integrand_arr_one_halo_cross, x = axion_dic['M_int'], axis = 0) \
+                          * integrate.simpson(integrand_arr_one_halo_cross, x = axion_dic['M_int'], axis = 0) \
                           / (func_rho_comp_0(cosmo_dic['Omega_db_0']) 
                           * func_rho_comp_0(cosmo_dic['Omega_ax_0']) * axion_dic['frac_cluster'])
     else:
-        one_halo_term_cross = integrate.simps(integrand_arr_one_halo_cross, x = axion_dic['M_int'], axis = 0) \
+        one_halo_term_cross = integrate.simpson(integrand_arr_one_halo_cross, x = axion_dic['M_int'], axis = 0) \
                           / (func_rho_comp_0(cosmo_dic['Omega_db_0']) 
                           * func_rho_comp_0(cosmo_dic['Omega_ax_0']) * axion_dic['frac_cluster'])
 
@@ -73,10 +73,10 @@ def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic,
     integrand_arr_one_halo_ax =  axion_dic['M_ax'][:, None]**2 * halo_mass_func_arr_2[:, None] * np.array(dens_profile_ax_arr_2)**2 #for the integral over reduced array [M_cut, inf] 
     if one_halo_damping == True:
         one_halo_term_ax = (k/hmcode_dic['k_star'])**4 / (1+(k/hmcode_dic['k_star'])**4) \
-                           * integrate.simps(integrand_arr_one_halo_ax, x = axion_dic['M_int'], axis = 0) \
+                           * integrate.simpson(integrand_arr_one_halo_ax, x = axion_dic['M_int'], axis = 0) \
                            / (func_rho_comp_0(cosmo_dic['Omega_ax_0']) * axion_dic['frac_cluster'])**2 
     else:
-        one_halo_term_ax = integrate.simps(integrand_arr_one_halo_ax, x = axion_dic['M_int'], axis = 0) \
+        one_halo_term_ax = integrate.simpson(integrand_arr_one_halo_ax, x = axion_dic['M_int'], axis = 0) \
                            / (func_rho_comp_0(cosmo_dic['Omega_ax_0']) * axion_dic['frac_cluster'])**2 
     
 
@@ -101,7 +101,7 @@ def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic,
                                                   c_min, eta_given = eta_given, axion_dic=axion_dic) \
                         * ( 1 - integrate.simpson(M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None], x = M, axis = 0) \
                         / func_rho_comp_0(cosmo_dic['Omega_db_0']) ) 
-        factor2_cross = integrate.simps(integrand_arr_two_halo_cross, x = M, axis = 0) / func_rho_comp_0(cosmo_dic['Omega_db_0']) + summand2_cross
+        factor2_cross = integrate.simpson(integrand_arr_two_halo_cross, x = M, axis = 0) / func_rho_comp_0(cosmo_dic['Omega_db_0']) + summand2_cross
             
         ### axion two halo term integral ##
         integrand_arr_two_halo_ax = axion_dic['M_ax'][:, None] * halo_mass_func_arr_2[:, None] * halo_bias_arr_2[:, None] * dens_profile_ax_arr_2 #for the integral over reduced array [M_cut, inf]
@@ -114,7 +114,7 @@ def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic,
         if full_2h == True:
             two_halo_term_cross =  PS_cold* (1-hmcode_dic['f'] * (k/hmcode_dic['k_d'])**hmcode_dic['n_d']/(1+(k/hmcode_dic['k_d'])**hmcode_dic['n_d']))\
                                 * factor2_cross[0] \
-                                * integrate.simps(integrand_arr_two_halo_2_cross, x = axion_dic['M_int'], axis = 0)[:] \
+                                * integrate.simpson(integrand_arr_two_halo_2_cross, x = axion_dic['M_int'], axis = 0)[:] \
                                 / (func_rho_comp_0(cosmo_dic['Omega_ax_0']) * axion_dic['frac_cluster']) 
         else:
             two_halo_term_cross =  PS_cold* (1-hmcode_dic['f'] * (k/hmcode_dic['k_d'])**hmcode_dic['n_d']/(1+(k/hmcode_dic['k_d'])**hmcode_dic['n_d']))
@@ -123,7 +123,7 @@ def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic,
         if full_2h == True:
             two_halo_term_cross =  PS_cold\
                                 * factor2_cross[0] \
-                                * integrate.simps(integrand_arr_two_halo_2_cross, x = axion_dic['M_int'], axis = 0)[:] \
+                                * integrate.simpson(integrand_arr_two_halo_2_cross, x = axion_dic['M_int'], axis = 0)[:] \
                                 / (func_rho_comp_0(cosmo_dic['Omega_ax_0']) * axion_dic['frac_cluster']) 
         else:
             two_halo_term_cross =  PS_cold
@@ -135,14 +135,14 @@ def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic,
     if two_halo_damping == True:
         if full_2h == True:
             two_halo_term_ax =  PS_cold * (1-hmcode_dic['f'] * (k/hmcode_dic['k_d'])**hmcode_dic['n_d']/(1+(k/hmcode_dic['k_d'])**hmcode_dic['n_d']))\
-                            * integrate.simps(integrand_arr_two_halo_ax, x = axion_dic['M_int'], axis = 0)[:]**2 \
+                            * integrate.simpson(integrand_arr_two_halo_ax, x = axion_dic['M_int'], axis = 0)[:]**2 \
                             / (func_rho_comp_0(cosmo_dic['Omega_ax_0']) * axion_dic['frac_cluster'])**2 
         else:
             two_halo_term_ax =  PS_cold * (1-hmcode_dic['f'] * (k/hmcode_dic['k_d'])**hmcode_dic['n_d']/(1+(k/hmcode_dic['k_d'])**hmcode_dic['n_d']))
     else:
         if full_2h == True:
             two_halo_term_ax =  PS_cold\
-                            * integrate.simps(integrand_arr_two_halo_ax, x = axion_dic['M_int'], axis = 0)[:]**2 \
+                            * integrate.simpson(integrand_arr_two_halo_ax, x = axion_dic['M_int'], axis = 0)[:]**2 \
                             / (func_rho_comp_0(cosmo_dic['Omega_ax_0']) * axion_dic['frac_cluster'])**2 
         else:
             two_halo_term_ax =  PS_cold

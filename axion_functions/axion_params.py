@@ -49,6 +49,6 @@ def func_axion_param_dic(M, cosmo_dic, power_spec_dic, hmcode_dic, concentration
     integrand_arr = func_halo_mass_function(axion_param_dic['M_int'], k, PS_cold , cosmo_dic, cosmo_dic['Omega_db_0']) * \
                     axion_param_dic['M_ax'] * \
                     func_halo_bias(axion_param_dic['M_int'], k, PS_cold, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['z'], cosmo_dic['G_a'])
-    axion_param_dic['frac_cluster'] = integrate.simps(y= integrand_arr, x = axion_param_dic['M_int'])/ func_rho_comp_0(cosmo_dic['Omega_ax_0'])
+    axion_param_dic['frac_cluster'] = integrate.simpson(y= integrand_arr, x = axion_param_dic['M_int'])/ func_rho_comp_0(cosmo_dic['Omega_ax_0'])
     
     return axion_param_dic

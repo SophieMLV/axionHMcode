@@ -311,7 +311,7 @@ def func_dens_profile_ax_kspace(k, M, cosmo_dic, power_spec_dic, M_cut, central_
         dens_profile_arr = func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, M_cut, central_dens_param, hmcode_dic, 
                                                 concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic) \
                            * r_arr**2 * np.sin(np.outer(k, r_arr)) / np.outer(k, r_arr)
-        return list(4 * np.pi * integrate.simps(y=dens_profile_arr, x = r_arr, axis=-1) / M_ax)
+        return list(4 * np.pi * integrate.simpson(y=dens_profile_arr, x = r_arr, axis=-1) / M_ax)
 
     else:
         dens_profile_kspace_arr = []
@@ -323,7 +323,7 @@ def func_dens_profile_ax_kspace(k, M, cosmo_dic, power_spec_dic, M_cut, central_
                 dens_profile_arr = func_dens_profile_ax(r_arr, m, cosmo_dic, power_spec_dic, M_cut, central_dens_param[idx], hmcode_dic, 
                                                         concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic) \
                                    * r_arr**2 * np.sin(np.outer(k, r_arr)) / np.outer(k, r_arr)
-                dens_kspace = list(4 * np.pi * integrate.simps(y=dens_profile_arr, x = r_arr, axis=-1) / M_ax[idx] )
+                dens_kspace = list(4 * np.pi * integrate.simpson(y=dens_profile_arr, x = r_arr, axis=-1) / M_ax[idx] )
                 dens_profile_kspace_arr.append(dens_kspace)
         
         return dens_profile_kspace_arr

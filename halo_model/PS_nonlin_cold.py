@@ -41,9 +41,9 @@ def func_non_lin_PS_matter(M, k, PS, cosmo_dic, hmcode_dic, Omega_0,
     integrand_arr_one = M[:, None]**2 * halo_mass_func_arr[:, None] * dens_profile_arr**2 
     # No neutrinos in halos
     if ax_one_halo == True:
-        one_halo = (1-f_ax)**2 * integrate.simps(integrand_arr_one, x = M, axis = 0)/ func_rho_comp_0(Omega_0)**2  
+        one_halo = (1-f_ax)**2 * integrate.simpson(integrand_arr_one, x = M, axis = 0)/ func_rho_comp_0(Omega_0)**2  
     else:
-        one_halo = integrate.simps(integrand_arr_one, x = M, axis = 0)/ func_rho_comp_0(Omega_0)**2  
+        one_halo = integrate.simpson(integrand_arr_one, x = M, axis = 0)/ func_rho_comp_0(Omega_0)**2  
     
     # One halo damping
     if one_halo_damping == True:
