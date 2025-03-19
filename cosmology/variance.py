@@ -32,19 +32,19 @@ def func_sigma_r(R, k, PS):
     """
     R in Mpc/h, k is in units of h/Mpc and PS in (Mpc/h)^3.
     returns variance of the power spectrum filterd by a spherical top hat function
-    """    
+    """
     #integrand = PS * spherical_tophat_window_function(R, k) ** 2 * k ** 2
-    #sigma_squared = integrate.simps(y=integrand, x=k, axis=-1) / (2. * np.pi ** 2)
+    #sigma_squared = integrate.simpson(y=integrand, x=k, axis=-1) / (2. * np.pi ** 2)
     #sigma_squared = np.trapz(integrand, x=k, axis=-1) / (2. * np.pi ** 2) 
     if isinstance(R, (int, float)) == True:
-        integrand = PS * spherical_tophat_window_function(R, k)[0] ** 2 * k ** 2
-        sigma_squared = np.trapz(integrand, k) / (2. * np.pi ** 2)
+        integrand = PS * spherical_tophat_window_function(R, k)[0] ** 2 * k ** 3
+        sigma_squared = np.trapz(integrand, np.log(k)) / (2. * np.pi ** 2)
     else:
         sigma_squared = np.zeros(len(R))
     
         for i in range(len(R)):
-            integrand = PS * spherical_tophat_window_function(R[i], k)[0] ** 2 * k ** 2
-            sigma_squared[i] = np.trapz(integrand, k) / (2. * np.pi ** 2)
+            integrand = PS * spherical_tophat_window_function(R[i], k)[0] ** 2 * k ** 3
+            sigma_squared[i] = np.trapz(integrand, np.log(k)) / (2. * np.pi ** 2)
 
     return np.sqrt(sigma_squared)
 
@@ -73,12 +73,12 @@ def func_sigma_M(M, k, PS, Omega_0):
     return func_sigma_r(R, k, PS)
 
 @njit
-def func_nu(M, k, PS_cold, Omega_0_sigma, Omega_m_0, Omega_w_0, z, G_a):
+def func_nu(M, k, PS_cold, Omega_ax_0, Omega_0_sigma, Omega_m_0, Omega_w_0, z, G_a):
     """
     k is in units of h/Mpc, PS_cold in (Mpc/h)^3 and M in solar_mass/h,
     NOTE: Omega_0 must match with chosen PS_cold
     """
-    delta_c = func_delta_c(z, Omega_m_0, Omega_w_0, G_a)
+    delta_c = func_delta_c(z, Omega_ax_0, Omega_m_0, Omega_w_0, G_a)
     return delta_c/func_sigma_M(M, k, PS_cold, Omega_0_sigma)
 
 @njit
