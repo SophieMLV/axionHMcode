@@ -53,7 +53,8 @@ def func_halo_mass_function(M, k, PS, cosmo_dic, Omega_0):
     z = cosmo_dic['z']
     Omega_m_0 = cosmo_dic['Omega_m_0']
     Omega_w_0 = cosmo_dic['Omega_w_0']
-    nu = func_nu(M, k, PS, Omega_0, Omega_m_0, Omega_w_0, z, cosmo_dic['G_a'])
+    Omega_ax_0 = cosmo_dic['Omega_ax_0']
+    nu = func_nu(M, k, PS, Omega_ax_0, Omega_0, Omega_m_0, Omega_w_0, z, cosmo_dic['G_a'])
     
     # Implementing 2111.01199 Eq. (30) for mixed dark matter
     if 'alpha_1' in cosmo_dic and 'alpha_2' in cosmo_dic:
@@ -64,6 +65,5 @@ def func_halo_mass_function(M, k, PS, cosmo_dic, Omega_0):
         factor = 1 - f_ax + f_ax*(1+(M/M0)**(-alpha_1))**(-alpha_2/alpha_1)
     else:
         factor = 1
-    
     return 1./2. * func_rho_comp_0(Omega_0) / M**2 * func_sheth_tormen(nu) \
            * np.abs(func_dlnsigma2_dlnM(M, k, PS, cosmo_dic, Omega_0)) * factor

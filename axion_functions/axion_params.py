@@ -23,10 +23,10 @@ def func_axion_param_dic(M, cosmo_dic, power_spec_dic, hmcode_dic, concentration
     axion_param_dic['beta1'] = 1
     axion_param_dic['beta2'] = func_beta2(cosmo_dic, power_spec_dic, axion_dic = 'ignore')
     #cut of mass. Below this cold halo mass no axion halo exists
-    axion_param_dic['M_cut'] = func_cut_mass_axion_halo(cosmo_dic, power_spec_dic, c_min, axion_dic='ignore')
+    #axion_param_dic['M_cut'] = func_cut_mass_axion_halo(cosmo_dic, power_spec_dic, c_min, axion_dic='ignore')
     #cold halo masses for which an axion halo exists
     axion_param_dic['M_int'] = deepcopy(M)
-    axion_param_dic['central_dens'] = func_central_density_param(axion_param_dic['M_int'], cosmo_dic, power_spec_dic, axion_param_dic['M_cut'], 
+    axion_param_dic['central_dens'] = func_central_density_param(axion_param_dic['M_int'], cosmo_dic, power_spec_dic, 
                                                                  concentration_param=concentration_param, eta_given=False, axion_dic=axion_param_dic)
     
     #for some halo mass no central density parameter can be found, ie there is no axion halo for this halo mass and M_int must be reduced
@@ -48,7 +48,7 @@ def func_axion_param_dic(M, cosmo_dic, power_spec_dic, hmcode_dic, concentration
     PS_cold = power_spec_dic['power_cold']
     integrand_arr = func_halo_mass_function(axion_param_dic['M_int'], k, PS_cold , cosmo_dic, cosmo_dic['Omega_db_0']) * \
                     axion_param_dic['M_ax'] * \
-                    func_halo_bias(axion_param_dic['M_int'], k, PS_cold, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['z'], cosmo_dic['G_a'])
+                    func_halo_bias(axion_param_dic['M_int'], k, PS_cold, cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['z'], cosmo_dic['G_a'])
     axion_param_dic['frac_cluster'] = integrate.simpson(y= integrand_arr, x = axion_param_dic['M_int'])/ func_rho_comp_0(cosmo_dic['Omega_ax_0'])
     
     return axion_param_dic

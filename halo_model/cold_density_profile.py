@@ -23,9 +23,10 @@ def func_z_formation(M, k, PS, cosmo_dic, Omega_0, f = 0.01):
     z = cosmo_dic['z']
     Omega_m_0 = cosmo_dic['Omega_m_0']
     Omega_w_0 = cosmo_dic['Omega_w_0']
+    Omega_ax_0 = cosmo_dic['Omega_ax_0']
     D_norm =  func_D_z_norm(z, Omega_m_0, Omega_w_0)
     def func_find_root(x, Mass):
-        nu = func_nu(f*Mass, k, PS, Omega_0, Omega_m_0, Omega_w_0, z, cosmo_dic['G_a'])
+        nu = func_nu(f*Mass, k, PS, Omega_ax_0, Omega_0, Omega_m_0, Omega_w_0, z, cosmo_dic['G_a'])
         return func_D_z_norm(x, Omega_m_0, Omega_w_0) - D_norm * nu
     if isinstance(M, (int, float)) == True:
         # Test if we find a root, if not by definition formation redshift is set to given z.
@@ -88,15 +89,16 @@ def func_dens_profile_kspace(M, k, PS, cosmo_dic, hmcode_dic, Omega_0, c_min, et
     z = cosmo_dic['z']
     Omega_m_0 = cosmo_dic['Omega_m_0']
     Omega_w_0 = cosmo_dic['Omega_w_0']
+    Omega_ax_0 = cosmo_dic['Omega_ax_0']
     #eta is a halo shape parameter introduced my Mead in https://arxiv.org/abs/2009.01858 in Tab2
     if eta_given == True:
         eta = np.array([hmcode_dic['eta']])
-        nu = np.atleast_1d(func_nu(M, k, PS, Omega_0, Omega_m_0, Omega_w_0, z, cosmo_dic['G_a']))
+        nu = np.atleast_1d(func_nu(M, k, PS, Omega_ax_0, Omega_0, Omega_m_0, Omega_w_0, z, cosmo_dic['G_a']))
     else:
         eta = np.array([0.]) 
         nu = np.array([1.])
 
-    R_vir = np.atleast_1d(func_r_vir(cosmo_dic['z'], M, Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['G_a']))
+    R_vir = np.atleast_1d(func_r_vir(cosmo_dic['z'], M, Omega_ax_0, Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['G_a']))
     concentration = np.atleast_1d(func_conc_param(M, k, PS, cosmo_dic, Omega_0, c_min, axion_dic=axion_dic))
     
     k_scaled = k * nu[:, None]**eta[:, None]
@@ -125,14 +127,15 @@ def func_delta_char(M, k, PS, cosmo_dic, hmcode_dic, Omega_0, c_min, eta_given =
     z = cosmo_dic['z']
     Omega_m_0 = cosmo_dic['Omega_m_0']
     Omega_w_0 = cosmo_dic['Omega_w_0']
+    Omega_ax_0 = cosmo_dic['Omega_ax_0']
     #eta is a halo shape parameter introduced my Mead in https://arxiv.org/abs/2009.01858 in Tab2
     if eta_given == True:
         eta = hmcode_dic['eta']
-        nu = func_nu(M, k, PS, Omega_0, Omega_m_0, Omega_w_0, z, cosmo_dic['G_a'])
+        nu = func_nu(M, k, PS, Omega_ax_0, Omega_0, Omega_m_0, Omega_w_0, z, cosmo_dic['G_a'])
     else:
         eta = np.array([0.]) 
         nu = 1.   
-    Delta_vir = func_Delta_vir(cosmo_dic['z'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
+    Delta_vir = func_Delta_vir(cosmo_dic['z'], Omega_ax_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
     
     concentration = func_conc_param(M, k, PS, cosmo_dic, Omega_0, c_min, axion_dic=axion_dic) / (nu**eta)
     delta_char = func_rho_comp_0(Omega_0) * Delta_vir * concentration **3 / (3. * func_for_norm_factor(concentration))
@@ -148,17 +151,18 @@ def NFW_profile(M, r, k, PS, cosmo_dic, hmcode_dic, Omega_0, c_min, eta_given = 
     z = cosmo_dic['z']
     Omega_m_0 = cosmo_dic['Omega_m_0']
     Omega_w_0 = cosmo_dic['Omega_w_0']
+    Omega_ax_0 = cosmo_dic['Omega_ax_0']
     #eta is a halo shape parameter introduced my Mead in https://arxiv.org/abs/2009.01858 in Tab2
     if eta_given == True:
         eta = hmcode_dic['eta']
-        nu = func_nu(M, k, PS, cosmo_dic, Omega_0, Omega_m_0, Omega_w_0, z, cosmo_dic['G_a'])
+        nu = func_nu(M, k, PS, Omega_ax_0, cosmo_dic, Omega_0, Omega_m_0, Omega_w_0, z, cosmo_dic['G_a'])
     else:
         eta = np.array([0.]) 
         nu = 1.
         
     concentration = func_conc_param(M, k, PS, cosmo_dic, Omega_0, c_min, axion_dic=axion_dic) / (nu**eta)
     normalisation = func_delta_char(M, k, PS, cosmo_dic, hmcode_dic, Omega_0, c_min, eta_given = eta_given, axion_dic=axion_dic)
-    r_s = func_r_vir(cosmo_dic['z'], M, Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['G_a']) / concentration
+    r_s = func_r_vir(cosmo_dic['z'], M, Omega_ax_0, Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['G_a']) / concentration
     
     NFW_func = 1 /((r/r_s) * (1+r/r_s)**2)
     

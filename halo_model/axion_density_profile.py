@@ -53,7 +53,7 @@ def func_core_radius(M, cosmo_dic):
     """
     grav_const = 1.3271244e+20 #const.G.to('m**3/(Msun*s**2)').value
     M_tot = (1 + cosmo_dic['omega_ax_0']/cosmo_dic['omega_db_0']) * M/cosmo_dic['h'] # in solar_mass
-    r_vir = func_r_vir(cosmo_dic['z'], (1 + cosmo_dic['omega_ax_0']/cosmo_dic['omega_db_0']) * M, cosmo_dic['Omega_m_0'], 
+    r_vir = func_r_vir(cosmo_dic['z'], (1 + cosmo_dic['omega_ax_0']/cosmo_dic['omega_db_0']) * M, cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_m_0'], 
                        cosmo_dic['Omega_m_0'],  cosmo_dic['Omega_w_0'], cosmo_dic['G_a']) / cosmo_dic['h'] * 3.086e+22 # in m
     v_vir = np.sqrt(grav_const*M_tot/r_vir) # in m/s
     # print(r_vir)
@@ -91,7 +91,7 @@ def func_rho_soliton(r, M, cosmo_dic, rho_central_param):
     
 
 
-def func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, M_cut, rho_central_param, hmcode_dic, concentration_param=False, eta_given=False, axion_dic=None):
+def func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, rho_central_param, hmcode_dic, concentration_param=False, eta_given=False, axion_dic=None):
     """
     r_arr in Mpc/h, M in solar_mass/h
     returns the axion density profile
@@ -151,7 +151,7 @@ def func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, M_cut, rho_central
         return return_arr
                 
         
-def func_ax_halo_mass(M, cosmo_dic, power_spec_dic, M_cut, rho_central_param, hmcode_dic, concentration_param=False, eta_given=False, axion_dic=None):
+def func_ax_halo_mass(M, cosmo_dic, power_spec_dic, rho_central_param, hmcode_dic, concentration_param=False, eta_given=False, axion_dic=None):
     """
     M in solar_mass/h
     The free parameter rho_central_param is set such that
@@ -162,23 +162,23 @@ def func_ax_halo_mass(M, cosmo_dic, power_spec_dic, M_cut, rho_central_param, hm
     """
     #distinguish whether M is an array or a scalar
     if isinstance(M, (int, float)) == True:
-        r_vir = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'],  cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
+        r_vir = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'],  cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
         r_arr = np.geomspace(1e-15, r_vir, num=2000)
-        integrand = func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, M_cut, rho_central_param, hmcode_dic, 
+        integrand = func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, rho_central_param, hmcode_dic, 
                                          concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic) * r_arr**2
         return 4 * np.pi * integrate.simpson(y=integrand, x = r_arr)
     else:
         integral = np.zeros(len(M))
         for i in range(len(M)):
-            upper_bound = func_r_vir(cosmo_dic['z'], M[i], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'],  cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
+            upper_bound = func_r_vir(cosmo_dic['z'], M[i], cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'],  cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
             R_int = np.geomspace(1e-15, upper_bound, num=2000)
-            integral[i] = 4 * np.pi * integrate.simpson(y=func_dens_profile_ax(R_int, M[i], cosmo_dic, power_spec_dic, M_cut, rho_central_param[i], hmcode_dic, 
+            integral[i] = 4 * np.pi * integrate.simpson(y=func_dens_profile_ax(R_int, M[i], cosmo_dic, power_spec_dic, rho_central_param[i], hmcode_dic, 
                                                                                concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic)*R_int**2, x=R_int)
             
         return integral
         
 
-def func_central_density_param(M, cosmo_dic, power_spec_dic, M_cut, concentration_param=False, eta_given=False, axion_dic=None):
+def func_central_density_param(M, cosmo_dic, power_spec_dic, concentration_param=False, eta_given=False, axion_dic=None):
     """
     M in solar_mass/h
     The central density of the soliton profile
@@ -196,7 +196,7 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic, M_cut, concentratio
         #guess is set via Omega_ax/Omega_cold * M = int_0_rvir \rho *r^2 dr
         #so we need the soliton and NFW part
         # def integrand_ax(x):
-        #     return func_dens_profile_ax(x, M, cosmo_dic, power_spec_dic, M_cut, 1., concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic)*x**2
+        #     return func_dens_profile_ax(x, M, cosmo_dic, power_spec_dic, 1., concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic)*x**2
         # #integral_soliton = integrate.quad(integrand_ax, 0, r_c)[0] # ALEX MODIF
         # xsamples = np.linspace(1e-6, r_c, 2000)
         # integral_soliton = integrate.trapezoid(integrand_ax(xsamples), x=xsamples)
@@ -214,7 +214,7 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic, M_cut, concentratio
         #find the central density parameter by solving the eq: 
         #M_ax_halo = Omega_ax/Omega_cold * M_cold_halo
         def func_find_root(dens):
-            return func_ax_halo_mass(M, cosmo_dic, power_spec_dic, M_cut, dens, hmcode_dic, concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic) - MaxofMc(M, axion_dic['beta1'], axion_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], c_frac, cosmo_dic['h'], cosmo_dic['m_ax'])
+            return func_ax_halo_mass(M, cosmo_dic, power_spec_dic, dens, hmcode_dic, concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic) - MaxofMc(M, axion_dic['beta1'], axion_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], c_frac, cosmo_dic['h'], cosmo_dic['m_ax'])
         
         #dens_param = optimize.brentq(func_find_root, 1e-2*guess, 1e4*guess, rtol=1e-3) # ALEX MODIF
         
@@ -240,7 +240,7 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic, M_cut, concentratio
             #guess is set via Omega_ax/Omega_cold * M = int_0_rvir \rho *r^2 dr
             #so we need the soliton and NFW part
             # def integrand_ax(x):
-            #     return func_dens_profile_ax(x, m, cosmo_dic, power_spec_dic, M_cut, 1., hmcode_dic, concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic)*x**2
+            #     return func_dens_profile_ax(x, m, cosmo_dic, power_spec_dic, 1., hmcode_dic, concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic)*x**2
             # #integral_soliton = integrate.quad(integrand_ax, 0, r_c[idx])[0] # ALEX MODIF
             # xsamples = np.linspace(1e-6, r_c[idx], 2000)
             # integral_soliton = integrate.trapezoid(integrand_ax(xsamples), x=xsamples)
@@ -259,7 +259,7 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic, M_cut, concentratio
             #find the central density parameter by solving the eq: 
             #M_ax_halo = Omega_ax/Omega_cold * M_cold_halo
             def func_find_root(dens):
-                return func_ax_halo_mass(m, cosmo_dic, power_spec_dic, M_cut, dens, hmcode_dic, concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic) - MaxofMc(m, axion_dic['beta1'], axion_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], c_frac, cosmo_dic['h'], cosmo_dic['m_ax'])
+                return func_ax_halo_mass(m, cosmo_dic, power_spec_dic, dens, hmcode_dic, concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic) - MaxofMc(m, axion_dic['beta1'], axion_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], c_frac, cosmo_dic['h'], cosmo_dic['m_ax'])
 
             #dens_param = optimize.brentq(func_find_root, 1e-4*guess, 1e4*guess, rtol=1e-3) # ALEX MODIF
             
@@ -291,7 +291,7 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic, M_cut, concentratio
 
 
 
-def func_dens_profile_ax_kspace(k, M, cosmo_dic, power_spec_dic, M_cut, central_dens_param, hmcode_dic, concentration_param=False, eta_given=False, axion_dic=None):
+def func_dens_profile_ax_kspace(k, M, cosmo_dic, power_spec_dic, central_dens_param, hmcode_dic, concentration_param=False, eta_given=False, axion_dic=None):
     """
     k in units of h/Mpc and M in solar_mass/h
     The free parameter central_dens_param is set such that
@@ -302,13 +302,13 @@ def func_dens_profile_ax_kspace(k, M, cosmo_dic, power_spec_dic, M_cut, central_
     """
     #the kspace density profile is defined via
     # \rho(k) = 4*\pi* int_0^r_vir \rho(r) * r^2 * sin(kr)/kr dr
-    M_ax = func_ax_halo_mass(M, cosmo_dic, power_spec_dic, M_cut, central_dens_param, hmcode_dic, concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic)
-    r_vir = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
+    M_ax = func_ax_halo_mass(M, cosmo_dic, power_spec_dic, central_dens_param, hmcode_dic, concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic)
+    r_vir = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
     
     #distinguish whether M is an array or a scalar
     if isinstance(M, (int, float)) == True:
         r_arr = np.geomspace(1e-15, r_vir, num=2000)
-        dens_profile_arr = func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, M_cut, central_dens_param, hmcode_dic, 
+        dens_profile_arr = func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, central_dens_param, hmcode_dic, 
                                                 concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic) \
                            * r_arr**2 * np.sin(np.outer(k, r_arr)) / np.outer(k, r_arr)
         return list(4 * np.pi * integrate.simpson(y=dens_profile_arr, x = r_arr, axis=-1) / M_ax)
@@ -320,7 +320,7 @@ def func_dens_profile_ax_kspace(k, M, cosmo_dic, power_spec_dic, M_cut, central_
                 dens_profile_kspace_arr.append(list(np.zeros(len(k))))
             else:
                 r_arr = np.geomspace(1e-15, r_vir[idx], num=2000)
-                dens_profile_arr = func_dens_profile_ax(r_arr, m, cosmo_dic, power_spec_dic, M_cut, central_dens_param[idx], hmcode_dic, 
+                dens_profile_arr = func_dens_profile_ax(r_arr, m, cosmo_dic, power_spec_dic, central_dens_param[idx], hmcode_dic, 
                                                         concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic) \
                                    * r_arr**2 * np.sin(np.outer(k, r_arr)) / np.outer(k, r_arr)
                 dens_kspace = list(4 * np.pi * integrate.simpson(y=dens_profile_arr, x = r_arr, axis=-1) / M_ax[idx] )
