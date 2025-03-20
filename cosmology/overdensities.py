@@ -50,7 +50,7 @@ def func_delta_c(z, Omega_ax_0, Omega_m_0, Omega_w_0, G_a):
     """
     returns critical denity for spherical/ellepsoidal collapse for LCDM cosmos
     """ 
-    g_a = func_D_z_unnorm(z, Omega_m_0, Omega_w_0)
+    g_a = func_D_z_unnorm(z, Omega_m_0, Omega_w_0)*(1+z)
     p_10 = -0.0069
     p_11 = -0.0208
     p_12 = 0.0312
@@ -78,8 +78,6 @@ def func_Delta_vir(z, Omega_ax_0, Omega_m_0, Omega_w_0, G_a):
     make the change, that only matter of the type 
     Omega_0 is take into accound for the overdensity
     """
-    # x = func_Omega_comp_z(z, Omega_m_0, Omega_m_0, Omega_w_0) - 1 # following the commented lines
-    # return (18*np.pi**2 + 82*x - 39*x**2) / (x+1)
     g_a = func_D_z_unnorm(z, Omega_m_0, Omega_w_0)*(1+z)
     p_10 = -0.79
     p_11 = -10.17
@@ -89,8 +87,8 @@ def func_Delta_vir(z, Omega_ax_0, Omega_m_0, Omega_w_0, G_a):
     p_21 = 0.38
     p_22 = 18.8
     p_23 = -15.87
-    f_1 = p_10 + p_11*(1-g_a) + p_12*(1-g_a)**2 + p_13*(1-G_a)
-    f_2 = p_20 + p_21*(1-g_a) + p_22*(1-g_a)**2 + p_23*(1-G_a)
+    f_1 = p_10 + p_11*(1-g_a) + p_12*(1-g_a)**2 + p_13*(1-G_a*(1+z))
+    f_2 = p_20 + p_21*(1-g_a) + p_22*(1-g_a)**2 + p_23*(1-G_a*(1+z))
 
     Omega_m_z = func_Omega_comp_z(z, Omega_m_0, Omega_m_0, Omega_w_0)
 
