@@ -63,7 +63,7 @@ def func_core_radius(M, cosmo_dic):
     grav_const = 1.3271244e+20 #const.G.to('m**3/(Msun*s**2)').value
     M_tot = (1 + cosmo_dic['omega_ax_0']/cosmo_dic['omega_db_0']) * M/cosmo_dic['h'] # in solar_mass
     r_vir = func_r_vir(cosmo_dic['z'], (1 + cosmo_dic['omega_ax_0']/cosmo_dic['omega_db_0']) * M, cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_m_0'], 
-                       cosmo_dic['Omega_m_0'],  cosmo_dic['Omega_w_0'], cosmo_dic['G_a']) / cosmo_dic['h'] * 3.086e+22 # in m
+                       cosmo_dic['Omega_m_0'],  cosmo_dic['Omega_w_0'], cosmo_dic['G_a'], cosmo_dic['version']) / cosmo_dic['h'] * 3.086e+22 # in m
     v_vir = np.sqrt(grav_const*M_tot/r_vir) # in m/s
     # print(r_vir)
     
@@ -171,7 +171,8 @@ def func_ax_halo_mass(M, cosmo_dic, power_spec_dic, rho_central_param, hmcode_di
     """
     #distinguish whether M is an array or a scalar
     if isinstance(M, (int, float)) == True:
-        r_vir = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'],  cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
+        r_vir = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], 
+                           cosmo_dic['Omega_w_0'], cosmo_dic['G_a'], cosmo_dic['version'])
         r_arr = np.geomspace(1e-15, r_vir, num=2000)
         integrand = func_dens_profile_ax(r_arr, M, cosmo_dic, power_spec_dic, rho_central_param, hmcode_dic, 
                                          concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic) * r_arr**2
@@ -179,7 +180,9 @@ def func_ax_halo_mass(M, cosmo_dic, power_spec_dic, rho_central_param, hmcode_di
     else:
         integral = np.zeros(len(M))
         for i in range(len(M)):
-            upper_bound = func_r_vir(cosmo_dic['z'], M[i], cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'],  cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
+            upper_bound = func_r_vir(cosmo_dic['z'], M[i], cosmo_dic['Omega_ax_0'], 
+                                     cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'],  
+                                     cosmo_dic['Omega_w_0'], cosmo_dic['G_a'], cosmo_dic['version'])
             R_int = np.geomspace(1e-15, upper_bound, num=2000)
             integral[i] = 4 * np.pi * integrate.simpson(y=func_dens_profile_ax(R_int, M[i], cosmo_dic, power_spec_dic, rho_central_param[i], hmcode_dic, 
                                                                                concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic)*R_int**2, x=R_int)
@@ -281,7 +284,8 @@ def func_dens_profile_ax_kspace(k, M, cosmo_dic, power_spec_dic, central_dens_pa
     #the kspace density profile is defined via
     # \rho(k) = 4*\pi* int_0^r_vir \rho(r) * r^2 * sin(kr)/kr dr
     M_ax = func_ax_halo_mass(M, cosmo_dic, power_spec_dic, central_dens_param, hmcode_dic, concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic)
-    r_vir = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
+    r_vir = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_db_0'], 
+                       cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['G_a'], cosmo_dic['version'])
     
     #distinguish whether M is an array or a scalar
     if isinstance(M, (int, float)) == True:

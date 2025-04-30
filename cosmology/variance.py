@@ -73,12 +73,12 @@ def func_sigma_M(M, k, PS, Omega_0):
     return func_sigma_r(R, k, PS)
 
 @njit
-def func_nu(M, k, PS_cold, Omega_ax_0, Omega_0_sigma, Omega_m_0, Omega_w_0, z, G_a):
+def func_nu(M, k, PS_cold, Omega_ax_0, Omega_0_sigma, Omega_m_0, Omega_w_0, z, G_a, version):
     """
     k is in units of h/Mpc, PS_cold in (Mpc/h)^3 and M in solar_mass/h,
     NOTE: Omega_0 must match with chosen PS_cold
     """
-    delta_c = func_delta_c(z, Omega_ax_0, Omega_m_0, Omega_w_0, G_a)
+    delta_c = func_delta_c(z, Omega_ax_0, Omega_m_0, Omega_w_0, G_a, version)
     return delta_c/func_sigma_M(M, k, PS_cold, Omega_0_sigma)
 
 @njit

@@ -35,7 +35,7 @@ def func_jeans_virial_ratio(M, cosmo_dic, power_spec_dic, c_min, axion_dic=None)
     """
     halo_jeans_scale = np.pi / func_halo_jeans_kscale(M, cosmo_dic, power_spec_dic, c_min, axion_dic=axion_dic) # in Mpc/h
     virial_radius = func_r_vir(cosmo_dic['z'], M, cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], 
-                               cosmo_dic['Omega_w_0'], cosmo_dic['G_a']) # in Mpc/h
+                               cosmo_dic['Omega_w_0'], cosmo_dic['G_a'], cosmo_dic['version']) # in Mpc/h
     
     return halo_jeans_scale/virial_radius
 

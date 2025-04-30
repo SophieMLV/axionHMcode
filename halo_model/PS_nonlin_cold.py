@@ -57,7 +57,7 @@ def func_non_lin_PS_matter(M, k, PS, cosmo_dic, hmcode_dic, Omega_0,
     if two_halo_damping == True:
 
         if full_2h == True:
-            halo_bias_arr = func_halo_bias(M, k, PS, cosmo_dic['Omega_ax_0'], Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['z'], cosmo_dic['G_a'])
+            halo_bias_arr = func_halo_bias(M, k, PS, cosmo_dic['Omega_ax_0'], Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['z'], cosmo_dic['G_a'], cosmo_dic['version'])
             integrand_arr_two = M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None] * dens_profile_arr
             
             #summand to take care of nummericals issues of the integral, see appendix A in https://arxiv.org/abs/2005.00009
@@ -72,7 +72,7 @@ def func_non_lin_PS_matter(M, k, PS, cosmo_dic, hmcode_dic, Omega_0,
 
     else:
         if full_2h == True:
-            halo_bias_arr = func_halo_bias(M, k, PS, cosmo_dic['Omega_ax_0'], Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['z'], cosmo_dic['G_a'])
+            halo_bias_arr = func_halo_bias(M, k, PS, cosmo_dic['Omega_ax_0'], Omega_0, cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['z'], cosmo_dic['G_a'], cosmo_dic['version'])
             integrand_arr_two = M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None] * dens_profile_arr
             #summand2 take care of nummericals issues of the integral, see appendix A in https://arxiv.org/abs/2005.00009
             summand2 = func_dens_profile_kspace(np.min(M), k, PS, cosmo_dic, hmcode_dic, Omega_0, 

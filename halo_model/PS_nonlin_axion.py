@@ -89,8 +89,8 @@ def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic,
                                                     cosmo_dic['Omega_db_0']) # for the integral over M ~[0, inf]
         dens_profile_cold_arr = func_dens_profile_kspace(M, k, PS_cold, cosmo_dic, hmcode_dic, cosmo_dic['Omega_db_0'], 
                                                          c_min, eta_given = eta_given, axion_dic=axion_dic) # for the integral over M ~[0, inf]
-        halo_bias_arr = func_halo_bias(M, k, PS_cold, cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['z'], cosmo_dic['G_a']) # for the integral over M ~[0, inf]
-        halo_bias_arr_2 = func_halo_bias(axion_dic['M_int'], k, PS_cold, cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['z'], cosmo_dic['G_a']) # for the integral over reduced array [M_cut, inf]
+        halo_bias_arr = func_halo_bias(M, k, PS_cold, cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['z'], cosmo_dic['G_a'], cosmo_dic['version']) # for the integral over M ~[0, inf]
+        halo_bias_arr_2 = func_halo_bias(axion_dic['M_int'], k, PS_cold, cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_db_0'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['z'], cosmo_dic['G_a'], cosmo_dic['version']) # for the integral over reduced array [M_cut, inf]
 
         ## cross two halo term integrals ##
         integrand_arr_two_halo_cross = M[:, None] * halo_mass_func_arr[:, None] * halo_bias_arr[:, None] * dens_profile_cold_arr  # integral over M ~[0, inf]

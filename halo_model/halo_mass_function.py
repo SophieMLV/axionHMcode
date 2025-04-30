@@ -54,7 +54,7 @@ def func_halo_mass_function(M, k, PS, cosmo_dic, Omega_0):
     Omega_m_0 = cosmo_dic['Omega_m_0']
     Omega_w_0 = cosmo_dic['Omega_w_0']
     Omega_ax_0 = cosmo_dic['Omega_ax_0']
-    nu = func_nu(M, k, PS, Omega_ax_0, Omega_0, Omega_m_0, Omega_w_0, z, cosmo_dic['G_a'])
+    nu = func_nu(M, k, PS, Omega_ax_0, Omega_0, Omega_m_0, Omega_w_0, z, cosmo_dic['G_a'], cosmo_dic['version'])
     
     # Implementing 2111.01199 Eq. (30) for mixed dark matter
     if 'alpha_1' in cosmo_dic and 'alpha_2' in cosmo_dic:

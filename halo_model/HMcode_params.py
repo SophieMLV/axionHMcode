@@ -53,7 +53,8 @@ def func_R_nonlin_2(cosmo_dic, k, PS):
     returns the nonlinear scale in Mpc/h defined by
     1 = sigma(R_nonlin)
     """
-    delta_c = func_delta_c(cosmo_dic['z'], cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_m_0'], cosmo_dic['Omega_w_0'], cosmo_dic['G_a'])
+    delta_c = func_delta_c(cosmo_dic['z'], cosmo_dic['Omega_ax_0'], cosmo_dic['Omega_m_0'], 
+                           cosmo_dic['Omega_w_0'], cosmo_dic['G_a'], cosmo_dic['version'])
     def find_root(lnR):
         # return func_sigma_r(np.exp(lnR), k, PS) - delta_c
         return np.log(func_sigma_r(np.exp(lnR), k, PS) / delta_c)
