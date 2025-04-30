@@ -23,25 +23,27 @@ def func_axion_param_dic(M, cosmo_dic, power_spec_dic, hmcode_dic, concentration
     axion_param_dic['beta1'] = 1
     axion_param_dic['beta2'] = func_beta2(cosmo_dic, power_spec_dic, axion_dic = 'ignore')
     #cut of mass. Below this cold halo mass no axion halo exists
-    #axion_param_dic['M_cut'] = func_cut_mass_axion_halo(cosmo_dic, power_spec_dic, c_min, axion_dic='ignore')
+    axion_param_dic['M_cut'] = func_cut_mass_axion_halo(cosmo_dic, power_spec_dic, c_min, axion_dic='ignore')
     #cold halo masses for which an axion halo exists
     axion_param_dic['M_int'] = deepcopy(M)
+    if cosmo_dic['version'] == 'basic':
+        axion_param_dic['M_int'] = axion_param_dic['M_int'][axion_param_dic['M_int'] >= axion_param_dic['M_cut']]
     axion_param_dic['central_dens'] = func_central_density_param(axion_param_dic['M_int'], cosmo_dic, power_spec_dic, 
                                                                  concentration_param=concentration_param, eta_given=False, axion_dic=axion_param_dic)
     
     #for some halo mass no central density parameter can be found, ie there is no axion halo for this halo mass and M_int must be reduced
     axion_param_dic['M_int'] = axion_param_dic['M_int'] * np.where(np.array(axion_param_dic['central_dens']) <= 0, 0, 1) #set mass to zero, if central densit param is zero
-    #print('Line 4')
+    
     axion_param_dic['M_int'] = axion_param_dic['M_int'][axion_param_dic['M_int'] != 0.0] #delete all zero halo masses
-    #print('Line 5')
+    
     axion_param_dic['central_dens'] = np.array(axion_param_dic['central_dens'])[np.array(axion_param_dic['central_dens']) != 0.0] #delete all zero central density params
     
     #axion halo mass, given by the Max(Mc) relation
     cdm_frac = 1 - cosmo_dic['omega_ax_0']/cosmo_dic['omega_m_0'] # 1 - ax_frac = 1 - f
-    #print('Line 6')
-    axion_param_dic['M_ax'] = MaxofMc(axion_param_dic['M_int'], axion_param_dic['beta1'], axion_param_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], cdm_frac, cosmo_dic['h'], cosmo_dic['m_ax'])
+    
+    axion_param_dic['M_ax'] = MaxofMc(axion_param_dic['M_int'], axion_param_dic['beta1'], axion_param_dic['beta2'], cosmo_dic['z'], 
+                                      cosmo_dic['omega_m_0'], cdm_frac, cosmo_dic['h'], cosmo_dic['m_ax'], cosmo_dic['version'], axion_param_dic['M_cut'])
 
-    #print('Generated axion dictionary')
 
     #not all axions cluster. Compute clustered fraction by f = 1/\rho_ax * int_Mcut^\inf n(M)*b(M)*M_ax(M) dM, see eq. 39 of https://arxiv.org/abs/2209.13445
     k = power_spec_dic['k']

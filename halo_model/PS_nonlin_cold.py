@@ -89,11 +89,12 @@ def func_non_lin_PS_matter(M, k, PS, cosmo_dic, hmcode_dic, Omega_0,
         Deltak = 0.1 # h/cMpc
         z = cosmo_dic['z']
         alphacdm = hmcode_dic['alpha'][0]
-        alpha1cdm = max(alphacdm, 1.1/(1+z)) # make sure alpha is not too small on large scales
-        if f_ax < 0.01:
-            alpha1cdm = alphacdm
-        alphacdm = alpha1cdm + (alphacdm - alpha1cdm)/(1 + np.exp((k_piv - k)/Deltak)) 
-        # Logistic function, which provides a smooth transition between the desired αα values. Δk controls the width of the transition region around kpivot
+        if cosmo_dic['version'] == 'dome':
+            alpha1cdm = max(alphacdm, 1.1/(1+z)) # make sure alpha is not too small on large scales
+            if f_ax < 0.01:
+                alpha1cdm = alphacdm
+            alphacdm = alpha1cdm + (alphacdm - alpha1cdm)/(1 + np.exp((k_piv - k)/Deltak)) 
+            # Logistic function, which provides a smooth transition between the desired αα values. Δk controls the width of the transition region around kpivot
     else:
         alphacdm = 1
         

@@ -71,6 +71,8 @@ def load_cosmology_input(params_path, LCDM = False):
             cosmo_dic['M_min'] = value
         elif key == 'M_max':
             cosmo_dic['M_max'] = value 
+        elif key == 'version':
+            cosmo_dic['version'] = value
         
     file.close()
 

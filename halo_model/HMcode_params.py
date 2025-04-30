@@ -76,36 +76,32 @@ def func_alpha_param(cosmo_dic, k, PS_cold):
     if R_nonlin <= 1e-5: # not exactly R[0] since we would want to ensure misc.derivative does not fail even when we are close to the edge of R
         neff = -3
     else:
-        # ln_R = np.log(R)
-            # ln_sigma_squared = np.log(func_sigma_r(R, k, PS_cold)**2)
-            # func_lnsigma_lnR = interpolate.interp1d(ln_R, ln_sigma_squared, kind = 'cubic', bounds_error=False, fill_value=0.)
-            # lnsigma_lnR = misc.derivative(func_lnsigma_lnR, np.log(R_nonlin))
-    
+        
         M_nonlin = (4 * np.pi * R_nonlin**3 * func_rho_comp_0(cosmo_dic['Omega_db_0']))/ 3
         dlnsigma2_dlnR = 3* func_dlnsigma2_dlnM(M_nonlin, k, PS_cold, cosmo_dic, cosmo_dic['Omega_db_0'])
-
-        # neff = -3 - lnsigma_lnR
         neff = -3 - dlnsigma2_dlnR
-        # print(neff, R_nonlin)
+
+    if cosmo_dic['version'] == 'basic':
+        return ((1.875 * (1.603)**neff), np.array([1]))
     
-    f_ax = cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_m_0']
-    m_ax = cosmo_dic['m_ax']
-    z = cosmo_dic['z']
-    # CDM-CDM
-    a1 = 0.124 # must be m_ax-dependent
-    b1 = 0.0450
-    c1 = 2.260e-01
-    d1 = 1.13e+00
-    s1 = 1 + a1*(10**(-24)/m_ax)**b1*f_ax**c1*(1+z)**d1
-    
-    # Cross
-    a2 = 0.0487 # must be m_ax-dependent
-    b2 = 0.0450
-    c2 = 2.24e-01
-    d2 = 2.21e+00
-    s2 = 1 + a2*(10**(-24)/m_ax)**b2*f_ax**c2*(1+z)**d2
-    
-    return ((1.875 * (1.603)**neff) / s1, (1.875 * (1.603)**neff) / s2)
+    else:
+        f_ax = cosmo_dic['Omega_ax_0']/cosmo_dic['Omega_m_0']
+        m_ax = cosmo_dic['m_ax']
+        z = cosmo_dic['z']
+        # CDM-CDM
+        a1 = 0.124 # must be m_ax-dependent
+        b1 = 0.0450
+        c1 = 2.260e-01
+        d1 = 1.13e+00
+        s1 = 1 + a1*(10**(-24)/m_ax)**b1*f_ax**c1*(1+z)**d1
+        
+        # Cross
+        a2 = 0.0487 # must be m_ax-dependent
+        b2 = 0.0450
+        c2 = 2.24e-01
+        d2 = 2.21e+00
+        s2 = 1 + a2*(10**(-24)/m_ax)**b2*f_ax**c2*(1+z)**d2
+        return ((1.875 * (1.603)**neff) / s1, (1.875 * (1.603)**neff) / s2)
 
 def HMCode_param_dic(cosmo_dic, k, PS_cold):
     """

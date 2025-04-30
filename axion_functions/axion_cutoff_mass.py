@@ -51,8 +51,8 @@ def func_cut_mass_axion_halo(cosmo_dic, power_spec_dic, c_min, axion_dic=None):
     def func_find_root(m):
         return func_jeans_virial_ratio(10**(m), cosmo_dic, power_spec_dic, c_min, axion_dic=axion_dic) -1
     
-    Mass_min = optimize.brentq(func_find_root, 7, 17)
-    return Mass_min
+    log10Mass_min = optimize.brentq(func_find_root, 7, 17)
+    return 10**(log10Mass_min)
 
 def func_beta2(cosmo_dic, power_spec_dic_sigma, axion_dic = None):
     """

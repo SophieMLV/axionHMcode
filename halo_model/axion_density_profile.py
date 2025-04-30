@@ -36,13 +36,22 @@ def getMJeq(z, OMEGA_M, little_h, m_a):
     MJeq = 4/3*np.pi*lJeq**3*rhocrit*OMEGA_M # M_sun/h
     return MJeq # M_sun/h
 
-def MaxofMc(M_c, beta1, beta2, z, OMEGA_M, c_frac, little_h, m_a):
+def MaxofMc(M_c, beta1, beta2, z, OMEGA_M, c_frac, little_h, m_a, version, M_cut, no_cut = False):
     # expects M_c in M_sun/h
-    MJeq = getMJeq(z, OMEGA_M, little_h, m_a) # M_sun/h
-    OMEGA_F = OMEGA_M*(1-c_frac)
-    OMEGA_C = OMEGA_M*c_frac
-    Max = (1 + (M_c/MJeq)**(-beta1))**(-beta2)*OMEGA_F/OMEGA_C*M_c
-    return Max # in M_sun/h
+    if version == 'basic':
+        OMEGA_F = OMEGA_M*(1-c_frac)
+        OMEGA_C = OMEGA_M*c_frac
+        if no_cut == True:
+            Max = OMEGA_F/OMEGA_C*M_c
+        else:
+            Max = OMEGA_F/OMEGA_C*M_c[M_c >=M_cut] # in M_sun/h
+        return Max
+    else:
+        MJeq = getMJeq(z, OMEGA_M, little_h, m_a) # M_sun/h
+        OMEGA_F = OMEGA_M*(1-c_frac)
+        OMEGA_C = OMEGA_M*c_frac
+        Max = (1 + (M_c/MJeq)**(-beta1))**(-beta2)*OMEGA_F/OMEGA_C*M_c
+        return Max # in M_sun/h
 
 def func_core_radius(M, cosmo_dic):
     """
@@ -204,13 +213,14 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic, concentration_param
                                         hmcode_dic['c_min'], eta_given = eta_given, axion_dic=axion_dic) \
                             *r_arr**2
         integral_NFW = integrate.simps(y=integrand_cold, x = r_arr)
-        integral_NFW = MaxofMc(integral_NFW, axion_dic['beta1'], axion_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], c_frac, cosmo_dic['h'], cosmo_dic['m_ax'])
+        integral_NFW = MaxofMc(integral_NFW, axion_dic['beta1'], axion_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], 
+                               c_frac, cosmo_dic['h'], cosmo_dic['m_ax'], cosmo_dic['version'], axion_dic['M_cut'], no_cut = True)
 
         guess = integral_NFW / integral_soliton
         
         #find the central density parameter
         def func_find_root(dens):
-            return func_ax_halo_mass(M, cosmo_dic, power_spec_dic, dens, hmcode_dic, concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic) - MaxofMc(M, axion_dic['beta1'], axion_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], c_frac, cosmo_dic['h'], cosmo_dic['m_ax'])
+            return func_ax_halo_mass(M, cosmo_dic, power_spec_dic, dens, hmcode_dic, concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic) - MaxofMc(M, axion_dic['beta1'], axion_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], c_frac, cosmo_dic['h'], cosmo_dic['m_ax'], cosmo_dic['version'], axion_dic['M_cut'])
         
         
         dens_param = optimize.root(func_find_root, x0 = guess).x
@@ -239,13 +249,13 @@ def func_central_density_param(M, cosmo_dic, power_spec_dic, concentration_param
                                             hmcode_dic['c_min'], eta_given = eta_given, axion_dic=axion_dic)*r_arr**2 
 
             integral_NFW = integrate.simpson(y=integrand_cold, x = r_arr)
-            integral_NFW = MaxofMc(integral_NFW, axion_dic['beta1'], axion_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], c_frac, cosmo_dic['h'], cosmo_dic['m_ax'])
-
+            integral_NFW = MaxofMc(integral_NFW, axion_dic['beta1'], axion_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], 
+                                   c_frac, cosmo_dic['h'], cosmo_dic['m_ax'], cosmo_dic['version'], axion_dic['M_cut'], no_cut = True)
             guess = integral_NFW / integral_soliton
             
             #find the central density parameter
             def func_find_root(dens):
-                return func_ax_halo_mass(m, cosmo_dic, power_spec_dic, dens, hmcode_dic, concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic) - MaxofMc(m, axion_dic['beta1'], axion_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], c_frac, cosmo_dic['h'], cosmo_dic['m_ax'])
+                return func_ax_halo_mass(m, cosmo_dic, power_spec_dic, dens, hmcode_dic, concentration_param=concentration_param, eta_given=eta_given, axion_dic=axion_dic) - MaxofMc(m, axion_dic['beta1'], axion_dic['beta2'], cosmo_dic['z'], cosmo_dic['omega_m_0'], c_frac, cosmo_dic['h'], cosmo_dic['m_ax'], cosmo_dic['version'], axion_dic['M_cut'])
             dens_param = optimize.root(func_find_root, x0 = guess).x
             
             #sometimes the solution is not really a solution,

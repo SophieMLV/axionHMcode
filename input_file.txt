@@ -13,3 +13,6 @@ ns = 0.9655			#scalar prectral index
 As = 2.2e-9			#scalar initial amplitude
 k_piv = 0.05 		#[1/Mpc] pivot scale
 transfer_kmax = 100 #max k axionCAMB runs
+
+# version, either basic or Dome+24 patch
+version = 'basic'      # or basic

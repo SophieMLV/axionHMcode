@@ -149,14 +149,19 @@ def func_full_halo_model_ax(M, power_spec_dic, cosmo_dic, hmcode_dic, axion_dic,
     ##########################################
     ############# Cross term #################
     ##########################################
-    PS_total_cross = axion_dic['frac_cluster']*((one_halo_term_cross**(alpha_param[1]) + two_halo_term_cross**(alpha_param[1]))**(1/alpha_param[1])) + (1-axion_dic['frac_cluster'])*np.sqrt(PS_ax * PS_cold_nonlin)
+    if alpha == True:
+        PS_total_cross = axion_dic['frac_cluster']*((one_halo_term_cross**(alpha_param[1]) + two_halo_term_cross**(alpha_param[1]))**(1/alpha_param[1])) + (1-axion_dic['frac_cluster'])*np.sqrt(PS_ax * PS_cold_nonlin)
+ 
+    else:
+        PS_total_cross = axion_dic['frac_cluster']*(one_halo_term_cross + two_halo_term_cross) + (1-axion_dic['frac_cluster'])*np.sqrt(PS_ax * PS_cold_nonlin)
+
 
     ###########################################
     ############ axion term ###################
     ###########################################
     PS_total_ax = axion_dic['frac_cluster']**2 * (one_halo_term_ax + two_halo_term_ax) \
-                  + 2*(1- axion_dic['frac_cluster']) * axion_dic['frac_cluster'] * np.sqrt((one_halo_term_ax + two_halo_term_ax)*PS_ax) \
-                  + (1- axion_dic['frac_cluster'])**2 * power_spec_dic['power_axion']  
+                + 2*(1- axion_dic['frac_cluster']) * axion_dic['frac_cluster'] * np.sqrt((one_halo_term_ax + two_halo_term_ax)*PS_ax) \
+                + (1- axion_dic['frac_cluster'])**2 * power_spec_dic['power_axion'] 
     
 
     ##########################################################
