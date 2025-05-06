@@ -68,7 +68,7 @@ def func_conc_param(M, k, PS, cosmo_dic, Omega_0, c_min, axion_dic=None):
         B *= factor
 
     conc_param = B * (1 + func_z_formation(M, k, PS, cosmo_dic, Omega_0) )/(1+cosmo_dic['z']) 
-    #print('Concentration - mass relation =', conc_param, M)
+
     return conc_param
 
 
