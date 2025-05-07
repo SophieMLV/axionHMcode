@@ -18,16 +18,18 @@ def func_axion_param_dic(M, cosmo_dic, power_spec_dic, hmcode_dic, concentration
     else:
         c_min = 4.
     #generate dictionary
-    #print('Entered axion function')
     axion_param_dic = {}
-    axion_param_dic['beta1'] = 1
-    axion_param_dic['beta2'] = func_beta2(cosmo_dic, power_spec_dic, axion_dic = 'ignore')
     #cut of mass. Below this cold halo mass no axion halo exists
     axion_param_dic['M_cut'] = func_cut_mass_axion_halo(cosmo_dic, power_spec_dic, c_min, axion_dic='ignore')
     #cold halo masses for which an axion halo exists
     axion_param_dic['M_int'] = deepcopy(M)
     if cosmo_dic['version'] == 'basic':
         axion_param_dic['M_int'] = axion_param_dic['M_int'][axion_param_dic['M_int'] >= axion_param_dic['M_cut']]
+        axion_param_dic['beta1'] = 1
+        axion_param_dic['beta2'] = 1
+    else:
+        axion_param_dic['beta1'] = 1
+        axion_param_dic['beta2'] = func_beta2(cosmo_dic, power_spec_dic, axion_dic = 'ignore')
     axion_param_dic['central_dens'] = func_central_density_param(axion_param_dic['M_int'], cosmo_dic, power_spec_dic, 
                                                                  concentration_param=concentration_param, eta_given=False, axion_dic=axion_param_dic)
     
